@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Swipe verticale tra immagini SetA / SetB</title>
+  <style>
+  html, body {
+    margin: 0;
+    padding: 0;
+    background-color: #f7f7f7;
+    height: 100vh;
+    width: 100vw;
+    font-family: sans-serif;
+    overflow: hidden;
+  }
+
+  #image-container {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+    padding: 12px;
+    box-sizing: border-box;
+    background-color: #f7f7f7;
+  }
+
+  #image-container img {
+    max-width: 95%;
+    max-height: 95%;
+    object-fit: contain;
+    border-radius: 16px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    border: 1px solid #ccc;
+    background-color: white;
+    padding: 4px;
+    transition: transform 0.3s ease, opacity 0.3s ease;
+    position: absolute;
+  }
+
+  #error-message {
+    position: absolute;
+    top: 10%;
+    left: 50%;
+    transform: translateX(-50%);
+    color: #e74c3c;
+    font-size: 1.5rem;
+    background-color: rgba(255, 255, 255, 0.95);
+    padding: 10px 20px;
+    border-radius: 12px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+    display: none;
+    z-index: 10;
+  }
+
+  .success-border {
+    border: 5px solid #2ecc71;
+    border-radius: 20px;
+  }
+
+  .error-border {
+    border: 5px solid #e74c3c;
+    border-radius: 20px;
+  }
+
+  .swipe-up {
+    transform: translateY(-100vh) rotate(-5deg);
+    opacity: 0;
+  }
+
+  .swipe-down {
+    transform: translateY(100vh) rotate(5deg);
+    opacity: 0;
+  }
+
+  @media (max-width: 600px) {
+    #image-container img {
+      max-width: 100%;
+      max-height: 100%;
+    }
+
+    #error-message {
+      font-size: 1.2rem;
+      padding: 8px 16px;
+    }
+  }
+</style>
+
+</head>
+<body>
+  <div id="image-container">
+    <div id="error-message">Swipe errato! Riprova.</div>
+  </div>
+
+  <script>
+    const setA = Array.from({ length: 10 }, (_, i) => ({ src: `setA/img${i+1}.jpg`, set: 'A' }));
+    const setB = Array.from({ length: 10 }, (_, i) => ({ src: `setB/img${i+1}.jpg`, set: 'B' }));
+
+    let imageSequence = [...setA, ...setB];
+    imageSequence = imageSequence.sort(() => Math.random() - 0.5);
+
+    const container = document.getElementById('image-container');
+    const errorMsg = document.getElementById('error-message');
+    let index = 0;
+
+    function showImage() {
+      container.classList.remove('success-border', 'error-border');
+      container.querySelectorAll('img').forEach(el => el.remove());
+      const current = imageSequence[index];
+      const img = document.createElement('img');
+      img.src = current.src;
+      img.classList.add('current-image');
+      container.appendChild(img);
+    }
+
+    function showError() {
+      errorMsg.style.display = 'block';
+      container.classList.add('error-border');
+      setTimeout(() => {
+        errorMsg.style.display = 'none';
+        container.classList.remove('error-border');
+      }, 1500);
+    }
+
+    function showSuccessFeedback() {
+      container.classList.add('success-border');
+      setTimeout(() => {
+        container.classList.remove('success-border');
+      }, 500);
+    }
+
+    function animateSwipe(direction, callback) {
+      const currentImg = container.querySelector('img');
+      if (currentImg) {
+        currentImg.classList.add(direction === 'up' ? 'swipe-up' : 'swipe-down');
+        setTimeout(() => {
+          callback();
+        }, 300);
+      } else {
+        callback();
+      }
+    }
+
+    function nextImage() {
+      index++;
+      if (index >= imageSequence.length) {
+        alert("Hai completato tutte le immagini!");
+        return;
+      }
+      showImage();
+    }
+
+    function handleSwipeDirection(direction) {
+      const current = imageSequence[index];
+      if (direction === 'down') {
+        if (current.set === 'A') {
+          showSuccessFeedback();
+          animateSwipe('down', nextImage);
+        } else {
+          showError();
+        }
+      } else if (direction === 'up') {
+        if (current.set === 'B') {
+          showSuccessFeedback();
+          animateSwipe('up', nextImage);
+        } else {
+          showError();
+        }
+      }
+    }
+
+    // Touch events per dispositivi mobili
+    let touchStartY = 0;
+    let touchEndY = 0;
+
+    container.addEventListener('touchstart', e => {
+      touchStartY = e.changedTouches[0].screenY;
+    });
+
+    container.addEventListener('touchend', e => {
+      touchEndY = e.changedTouches[0].screenY;
+      const diff = touchEndY - touchStartY;
+      if (diff > 50) {
+        handleSwipeDirection('down');
+      } else if (diff < -50) {
+        handleSwipeDirection('up');
+      }
+    });
+
+    // Keyboard events per PC
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'ArrowDown') {
+        handleSwipeDirection('down');
+      } else if (e.key === 'ArrowUp') {
+        handleSwipeDirection('up');
+      }
+    });
+
+    showImage();
+  </script>
+</body>
+</html>

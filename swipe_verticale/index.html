@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Presentazione Immagini</title>
+<style>
+  html, body {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    width: 100%;
+    overflow: hidden;
+    font-family: sans-serif;
+    background-color: #ffffff;
+  }
+
+  .container {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-evenly;
+    align-items: center;
+    box-sizing: border-box;
+    padding: 10px;
+  }
+
+  .image-block {
+    flex: 1;
+    width: 100%;
+    max-height: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 10px;
+    box-sizing: border-box;
+  }
+
+  .image-block img {
+    max-width: 95%;
+    max-height: 95%;
+    width: auto;
+    height: auto;
+    object-fit: contain;
+    border-radius: 16px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    border: 1px solid #ccc;
+    background-color: white;
+    padding: 4px;
+  }
+
+  .x-screen {
+    width: 100%;
+    height: 100%;
+    display: none;
+    justify-content: center;
+    align-items: center;
+    font-size: 10vw;
+    font-weight: bold;
+    color: #333;
+    background-color: white;
+  }
+
+  .final-message {
+    font-size: 1rem;
+    color: #2ecc71;
+    background-color: white;
+    padding: 20px;
+    border-radius: 16px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    text-align: center;
+  }
+
+  @media (max-width: 600px) {
+    .image-block {
+      padding: 5px;
+    }
+
+    .image-block img {
+      max-width: 100%;
+      max-height: 100%;
+    }
+
+    .final-message {
+      font-size: 1rem;
+      padding: 16px;
+    }
+  }
+</style>
+</head>
+<body>
+
+  <div class="container" id="imageContainer">
+    <div class="image-block" id="topImageBlock">
+      <img id="topImage" src="" alt="Top image">
+    </div>
+    <div class="image-block" id="bottomImageBlock">
+      <img id="bottomImage" src="" alt="Bottom image">
+    </div>
+  </div>
+
+  <div class="x-screen" id="xScreen">X</div>
+  <div id="finalMessage" class="final-message" style="display: none;">
+    Hai completato la sequenza. Ora premi il bottone blu qui sotto per proseguire.
+  </div>
+
+<script>
+  const setA = ["img1.png", "img2.png", "img3.png", "img4.png", "img5.png", "img6.png", "img7.png", "img8.png", "img9.png", "img10.png"];
+  const setB = ["img1.png", "img2.png", "img3.png", "img4.png", "img5.png", "img6.png", "img7.png", "img8.png", "img9.png", "img10.png"];
+  const setC = ["img1.png", "img2.png", "img3.png", "img4.png", "img5.png", "img6.png", "img7.png", "img8.png", "img9.png", "img10.png"];
+  const setD = ["img1.png", "img2.png", "img3.png", "img4.png", "img5.png", "img6.png", "img7.png", "img8.png", "img9.png", "img10.png"];
+
+  const topImg = document.getElementById("topImage");
+  const bottomImg = document.getElementById("bottomImage");
+  const container = document.getElementById("imageContainer");
+  const xScreen = document.getElementById("xScreen");
+  const finalMsg = document.getElementById("finalMessage");
+
+  const totalCycles = 20; // ad esempio 20 cicli di immagini
+  let currentCycle = 0;
+
+  function getRandomItem(arr) {
+    return arr[Math.floor(Math.random() * arr.length)];
+  }
+
+  function showImages() {
+    const useSetAorC = Math.random() < 0.5;
+    const box1Image = useSetAorC
+      ? "setA/" + getRandomItem(setA)
+      : "setC/" + getRandomItem(setC);
+
+    const useSetBorD = Math.random() < 0.5;
+    const box2Image = useSetBorD
+      ? "setB/" + getRandomItem(setB)
+      : "setD/" + getRandomItem(setD);
+
+    const box1OnTop = Math.random() < 0.5;
+
+    if (box1OnTop) {
+      topImg.src = box1Image;
+      bottomImg.src = box2Image;
+    } else {
+      topImg.src = box2Image;
+      bottomImg.src = box1Image;
+    }
+
+    xScreen.style.display = "none";
+    container.style.display = "flex";
+  }
+
+  function showXScreen() {
+    container.style.display = "none";
+    xScreen.style.display = "flex";
+  }
+
+  function cycle() {
+    if (currentCycle >= totalCycles) {
+  container.style.display = "none";
+  xScreen.style.display = "none";
+  finalMsg.style.display = "block";
+
+  // ▶️ Invia segnale a Qualtrics per mostrare il bottone Avanti
+  if (window.parent && window.parent !== window) {
+    window.parent.postMessage("nextButton", "*");
+  }
+
+  return;
+}
+
+    currentCycle++;
+    showImages();
+    setTimeout(() => {
+      showXScreen();
+      setTimeout(cycle, 1000);
+    }, 2000);
+  }
+
+  cycle();
+</script>
+
+
+<script>
+  // Previene il "pull-to-refresh" su dispositivi mobili all'interno dell'iframe
+  let touchstartY = 0;
+
+  window.addEventListener('touchstart', function(e) {
+    if (e.touches.length !== 1) return;
+    touchstartY = e.touches[0].clientY;
+  }, { passive: false });
+
+  window.addEventListener('touchmove', function(e) {
+    const touchY = e.touches[0].clientY;
+    const deltaY = touchY - touchstartY;
+
+    // Se l'utente sta scrollando verso il basso e siamo in cima alla pagina
+    if (deltaY > 0 && window.scrollY === 0) {
+      e.preventDefault();
+    }
+  }, { passive: false });
+</script>
+
+</body>
+</html>
