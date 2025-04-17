@@ -178,20 +178,25 @@
       container.appendChild(img);
 
       hintTimeout = setTimeout(() => {
-        const color = current.set === 'A' ? '#e74c3c' : '#2ecc71';
-        img.style.border = `5px solid ${color}`;
-      }, 0);
+        const hintColor = current.set === 'B' ? '#e74c3c' : '#2ecc71';
+        img.style.border = `5px solid ${hintColor}`;
+      }, 0); //LATENZA DI COMPARSA DEL COLORE DI INDICAZIONE DELLO SWIPE. set 0 per fare comparire il colore da subito.
     }
 
     function showError() {
       errorCount++;
       errorMsg.style.display = 'block';
       clearTimeout(hintTimeout);
+      const current = imageSequence[index];
       const img = container.querySelector('img');
-      if (img) img.style.border = '5px solid #e74c3c';
+      if (img) {
+        // Colore in base alla direzione attesa
+        const expectedColor = current.set === 'B' ? '#e74c3c' : '#2ecc71';
+        img.style.border = `5px solid ${expectedColor}`;
+      }
       setTimeout(() => {
         errorMsg.style.display = 'none';
-        if (img) img.style.border = '5px solid transparent';
+        // Mantiene il bordo finché non cambia immagine
       }, 1500);
     }
 
@@ -258,3 +263,4 @@
   </script>
 </body>
 </html>
+
