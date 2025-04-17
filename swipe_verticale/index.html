@@ -1,65 +1,59 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="it">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Presentazione Immagini</title>
-<style>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Swipe verticale tra immagini SetA / SetB</title>
+  <style>
   html, body {
     margin: 0;
     padding: 0;
-    height: 100%;
-    width: 100%;
-    overflow: hidden;
-    font-family: sans-serif;
     background-color: #ffffff;
+    height: 100vh;
+    width: 100vw;
+    font-family: sans-serif;
+    overflow: hidden;
   }
 
-  .container {
+  #image-container {
     width: 100%;
     height: 100%;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-evenly;
-    align-items: center;
-    box-sizing: border-box;
-    padding: 10px;
-  }
-
-  .image-block {
-    flex: 1;
-    width: 100%;
-    max-height: 50%;
     display: flex;
     justify-content: center;
     align-items: center;
-    padding: 10px;
+    position: relative;
+    padding: 12px;
     box-sizing: border-box;
+    background-color: #ffffff;
+    text-align: center;
   }
 
-  .image-block img {
+  #image-container img {
     max-width: 95%;
     max-height: 95%;
-    width: auto;
-    height: auto;
     object-fit: contain;
     border-radius: 16px;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-    border: 1px solid #ccc;
     background-color: white;
     padding: 4px;
+    border: none;
+    transition: transform 0.3s ease, opacity 0.3s ease, border 0.3s ease;
+    position: absolute;
   }
 
-  .x-screen {
-    width: 100%;
-    height: 100%;
+  #error-message {
+    position: absolute;
+    top: 10%;
+    left: 50%;
+    transform: translateX(-50%);
+    color: #e74c3c;
+    font-size: 1rem;
+    background-color: rgba(255, 255, 255, 0.95);
+    padding: 10px 20px;
+    border-radius: 12px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
     display: none;
-    justify-content: center;
-    align-items: center;
-    font-size: 10vw;
-    font-weight: bold;
-    color: #333;
-    background-color: white;
+    z-index: 10;
   }
 
   .final-message {
@@ -69,17 +63,38 @@
     padding: 20px;
     border-radius: 16px;
     box-shadow: 0 4px 12px rgba(0,0,0,0.2);
-    text-align: center;
+    z-index: 20;
+  }
+
+  .success-border-img {
+  box-shadow: 0 0 0 5px #2ecc71 !important;
+    border: 5px solid #2ecc71 !important;
+  }
+
+  .error-border-img {
+  box-shadow: 0 0 0 5px #e74c3c !important;
+    border: 5px solid #e74c3c !important;
+  }
+
+  .swipe-up {
+    transform: translateY(-100vh) rotate(-5deg);
+    opacity: 0;
+  }
+
+  .swipe-down {
+    transform: translateY(100vh) rotate(5deg);
+    opacity: 0;
   }
 
   @media (max-width: 600px) {
-    .image-block {
-      padding: 5px;
-    }
-
-    .image-block img {
+    #image-container img {
       max-width: 100%;
       max-height: 100%;
+    }
+
+    #error-message {
+      font-size: 1rem;
+      padding: 8px 16px;
     }
 
     .final-message {
@@ -90,115 +105,129 @@
 </style>
 </head>
 <body>
-
-  <div class="container" id="imageContainer">
-    <div class="image-block" id="topImageBlock">
-      <img id="topImage" src="" alt="Top image">
-    </div>
-    <div class="image-block" id="bottomImageBlock">
-      <img id="bottomImage" src="" alt="Bottom image">
-    </div>
+  <div id="image-container">
+    <div id="error-message">Swipe errato! Riprova.</div>
   </div>
 
-  <div class="x-screen" id="xScreen">X</div>
-  <div id="finalMessage" class="final-message" style="display: none;">
-    Hai completato la sequenza. Ora premi il bottone blu qui sotto per proseguire.
-  </div>
+  <script>
+    const setA = Array.from({ length: 10 }, (_, i) => ({ src: `setA/img${i+1}.jpg`, set: 'A' }));
+    const setB = Array.from({ length: 10 }, (_, i) => ({ src: `setB/img${i+1}.jpg`, set: 'B' }));
 
-<script>
-  const setA = ["img1.png", "img2.png", "img3.png", "img4.png", "img5.png", "img6.png", "img7.png", "img8.png", "img9.png", "img10.png"];
-  const setB = ["img1.png", "img2.png", "img3.png", "img4.png", "img5.png", "img6.png", "img7.png", "img8.png", "img9.png", "img10.png"];
-  const setC = ["img1.png", "img2.png", "img3.png", "img4.png", "img5.png", "img6.png", "img7.png", "img8.png", "img9.png", "img10.png"];
-  const setD = ["img1.png", "img2.png", "img3.png", "img4.png", "img5.png", "img6.png", "img7.png", "img8.png", "img9.png", "img10.png"];
+    let imageSequence = [...setA, ...setB];
+    imageSequence = imageSequence.sort(() => Math.random() - 0.5);
 
-  const topImg = document.getElementById("topImage");
-  const bottomImg = document.getElementById("bottomImage");
-  const container = document.getElementById("imageContainer");
-  const xScreen = document.getElementById("xScreen");
-  const finalMsg = document.getElementById("finalMessage");
+    const container = document.getElementById('image-container');
+    const errorMsg = document.getElementById('error-message');
+    let index = 0;
+    let errorCount = 0;
 
-  const totalCycles = 20; // ad esempio 20 cicli di immagini
-  let currentCycle = 0;
-
-  function getRandomItem(arr) {
-    return arr[Math.floor(Math.random() * arr.length)];
-  }
-
-  function showImages() {
-    const useSetAorC = Math.random() < 0.5;
-    const box1Image = useSetAorC
-      ? "setA/" + getRandomItem(setA)
-      : "setC/" + getRandomItem(setC);
-
-    const useSetBorD = Math.random() < 0.5;
-    const box2Image = useSetBorD
-      ? "setB/" + getRandomItem(setB)
-      : "setD/" + getRandomItem(setD);
-
-    const box1OnTop = Math.random() < 0.5;
-
-    if (box1OnTop) {
-      topImg.src = box1Image;
-      bottomImg.src = box2Image;
-    } else {
-      topImg.src = box2Image;
-      bottomImg.src = box1Image;
+    function showImage() {
+      container.querySelectorAll('img').forEach(el => el.remove());
+      const current = imageSequence[index];
+      const img = document.createElement('img');
+      img.src = current.src;
+      img.classList.add('current-image');
+      container.appendChild(img);
     }
 
-    xScreen.style.display = "none";
-    container.style.display = "flex";
-  }
-
-  function showXScreen() {
-    container.style.display = "none";
-    xScreen.style.display = "flex";
-  }
-
-  function cycle() {
-    if (currentCycle >= totalCycles) {
-  container.style.display = "none";
-  xScreen.style.display = "none";
-  finalMsg.style.display = "block";
-
-  // ▶️ Invia segnale a Qualtrics per mostrare il bottone Avanti
-  if (window.parent && window.parent !== window) {
-    window.parent.postMessage("nextButton", "*");
-  }
-
-  return;
-}
-
-    currentCycle++;
-    showImages();
-    setTimeout(() => {
-      showXScreen();
-      setTimeout(cycle, 1000);
-    }, 2000);
-  }
-
-  cycle();
-</script>
-
-
-<script>
-  // Previene il "pull-to-refresh" su dispositivi mobili all'interno dell'iframe
-  let touchstartY = 0;
-
-  window.addEventListener('touchstart', function(e) {
-    if (e.touches.length !== 1) return;
-    touchstartY = e.touches[0].clientY;
-  }, { passive: false });
-
-  window.addEventListener('touchmove', function(e) {
-    const touchY = e.touches[0].clientY;
-    const deltaY = touchY - touchstartY;
-
-    // Se l'utente sta scrollando verso il basso e siamo in cima alla pagina
-    if (deltaY > 0 && window.scrollY === 0) {
-      e.preventDefault();
+    function showError() {
+      errorCount++;
+      errorMsg.style.display = 'block';
+      const currentImg = container.querySelector('img');
+      if (currentImg) {
+        currentImg.classList.remove('success-border-img');
+        currentImg.classList.add('error-border-img');
+      }
+      setTimeout(() => {
+        errorMsg.style.display = 'none';
+        if (currentImg) currentImg.classList.remove('error-border-img');
+      }, 1500);
     }
-  }, { passive: false });
-</script>
 
+    function showSuccessFeedback() {
+      const currentImg = container.querySelector('img');
+      if (currentImg) {
+        currentImg.classList.remove('error-border-img');
+        currentImg.classList.add('success-border-img');
+        setTimeout(() => {
+          currentImg.classList.remove('success-border-img');
+        }, 800);
+      }
+    }
+
+    function animateSwipe(direction, callback) {
+      const currentImg = container.querySelector('img');
+      if (currentImg) {
+        currentImg.classList.add(direction === 'up' ? 'swipe-up' : 'swipe-down');
+        setTimeout(() => {
+          callback();
+        }, 300);
+      } else {
+        callback();
+      }
+    }
+
+    function nextImage() {
+      index++;
+      if (index >= imageSequence.length) {
+        container.innerHTML = '';
+        const msg = document.createElement('div');
+        msg.className = 'final-message';
+        msg.textContent = "Hai completato la sequenza. Ora premi il bottone blu qui sotto per proseguire.";
+        container.appendChild(msg);
+        if (window.parent && window.parent !== window) {
+          window.parent.postMessage({ SwipeUPErrorCount: errorCount }, "*");
+        }
+        return;
+      }
+      showImage();
+    }
+
+    function handleSwipeDirection(direction) {
+      const current = imageSequence[index];
+      if (direction === 'down') {
+        if (current.set === 'A') {
+          showSuccessFeedback();
+          animateSwipe('down', nextImage);
+        } else {
+          showError();
+        }
+      } else if (direction === 'up') {
+        if (current.set === 'B') {
+          showSuccessFeedback();
+          animateSwipe('up', nextImage);
+        } else {
+          showError();
+        }
+      }
+    }
+
+    let touchStartY = 0;
+    let touchEndY = 0;
+
+    container.addEventListener('touchstart', e => {
+      touchStartY = e.changedTouches[0].screenY;
+    });
+
+    container.addEventListener('touchend', e => {
+      touchEndY = e.changedTouches[0].screenY;
+      const diff = touchEndY - touchStartY;
+      if (diff > 50) {
+        handleSwipeDirection('down');
+      } else if (diff < -50) {
+        handleSwipeDirection('up');
+      }
+    });
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'ArrowDown') {
+        handleSwipeDirection('down');
+      } else if (e.key === 'ArrowUp') {
+        handleSwipeDirection('up');
+      }
+    });
+
+    showImage();
+  </script>
 </body>
 </html>
