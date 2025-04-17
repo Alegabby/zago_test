@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sequenza Immagini</title>
+  <style>
+  html, body {
+    margin: 0;
+    padding: 0;
+    background-color: #ffffff;
+    height: 100vh;
+    width: 100vw;
+    font-family: sans-serif;
+    overflow: hidden;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  #image-container {
+    max-width: 100%;
+    max-height: 100%;
+    width: 100%;
+    height: 100%;
+    padding: 12px;
+    box-sizing: border-box;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #ffffff;
+    text-align: center;
+  }
+
+  img {
+    max-width: 95%;
+    max-height: 95%;
+    object-fit: contain;
+    border-radius: 16px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    border: 1px solid #ccc;
+    background-color: white;
+    padding: 4px;
+    transition: opacity 0.3s ease;
+  }
+
+  .x-icon {
+    font-size: 10vw;
+    color: #444;
+    background-color: #ffffff;
+    border-radius: 12px;
+    padding: 10px 20px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+  }
+
+  .final-message {
+    font-size: 2rem;
+    color: #2ecc71;
+    background-color: white;
+    padding: 20px;
+    border-radius: 16px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+  }
+
+  @media (max-width: 600px) {
+    #image-container {
+      padding: 8px;
+    }
+
+    img {
+      max-width: 100%;
+      max-height: 100%;
+    }
+
+    .x-icon {
+      font-size: 12vw;
+    }
+
+    .final-message {
+      font-size: 1rem;
+      padding: 16px;
+    }
+  }
+</style>
+
+</head>
+<body>
+  <div id="image-container"></div>
+
+  <script>
+    const focusCount = 9;
+    const focusImage = 'images/focus_image.jpg';
+    const otherImages = Array.from({ length: 9 }, (_, i) => `images/img${i+1}.jpg`);
+
+    let imageSequence = Array(focusCount).fill(focusImage).concat(otherImages);
+    imageSequence = imageSequence.sort(() => Math.random() - 0.5);
+
+    const container = document.getElementById('image-container');
+    let index = 0;
+
+    function showNext() {
+  container.innerHTML = '';
+
+  if (index >= imageSequence.length) {
+    const msg = document.createElement('div');
+    msg.className = 'final-message';
+    msg.textContent = "Premi il bottone blu qui sotto per proseguire...";
+    container.appendChild(msg);
+
+    // ✅ Mostra il bottone "Avanti" di Qualtrics
+    if (window.parent && window.parent !== window) {
+      window.parent.postMessage("nextButton", "*");
+    }
+
+    return;
+  }
+
+  const img = document.createElement('img');
+  img.src = imageSequence[index];
+  container.appendChild(img);
+
+  setTimeout(() => {
+    container.innerHTML = '';
+    const x = document.createElement('div');
+    x.className = 'x-icon';
+    x.innerHTML = '&#10006;';
+    container.appendChild(x);
+
+    setTimeout(() => {
+      index++;
+      showNext();
+    }, 500);
+  }, 2500);
+}
+
+
+    showNext();
+  </script>
+</body>
+</html>
