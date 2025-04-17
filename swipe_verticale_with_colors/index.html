@@ -180,7 +180,7 @@
       hintTimeout = setTimeout(() => {
         const hintColor = current.set === 'B' ? '#e74c3c' : '#2ecc71';
         img.style.border = `5px solid ${hintColor}`;
-      }, 400);
+      }, 400); //LATENZA DI COMPARSA DEL COLORE DI INDICAZIONE DELLO SWIPE. set 0 per fare comparire il colore da subito.
     }
 
     function showError() {
