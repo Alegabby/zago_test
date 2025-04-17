@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Swipe verticale tra immagini SetA / SetB</title>
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      background-color: #ffffff;
+      height: 100vh;
+      width: 100vw;
+      font-family: sans-serif;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+    }
+
+    #image-container {
+      width: 90%;
+      height: 80%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      position: relative;
+      padding: 12px;
+      box-sizing: border-box;
+      background-color: #ffffff;
+    }
+
+    #image-container img {
+      max-width: 95%;
+      max-height: 95%;
+      object-fit: contain;
+      border-radius: 16px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+      background-color: white;
+      padding: 4px;
+      border: 5px solid transparent;
+      transition: transform 0.3s ease, opacity 0.3s ease, border 0.3s ease;
+      position: absolute;
+      box-sizing: border-box;
+    }
+
+    #legend {
+      width: 90%;
+      display: flex;
+      justify-content: center;
+      gap: 24px;
+      margin-top: 16px;
+    }
+
+    .legend-item {
+      display: flex;
+      align-items: center;
+      font-size: 1rem;
+      color: #333;
+    }
+
+    .legend-symbol {
+      display: inline-block;
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      margin-right: 8px;
+    }
+    .legend-symbol.up {
+      background-color: #e74c3c; /* rosso per swipe su */
+    }
+    .legend-symbol.down {
+      background-color: #2ecc71; /* verde per swipe giù */
+    }
+
+    #error-message {
+      position: absolute;
+      top: 10%;
+      left: 50%;
+      transform: translateX(-50%);
+      color: #e74c3c;
+      font-size: 1rem;
+      background-color: rgba(255, 255, 255, 0.95);
+      padding: 10px 20px;
+      border-radius: 12px;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+      display: none;
+      z-index: 10;
+    }
+
+    .final-message {
+      font-size: 1rem;
+      color: #2ecc71;
+      background-color: white;
+      padding: 20px;
+      border-radius: 16px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+      z-index: 20;
+      text-align: center;
+    }
+
+    .success-border-img {
+      box-shadow: 0 0 0 5px #2ecc71 !important;
+      border: 5px solid #2ecc71 !important;
+    }
+    .error-border-img {
+      box-shadow: 0 0 0 5px #e74c3c !important;
+      border: 5px solid #e74c3c !important;
+    }
+
+    .swipe-up {
+      transform: translateY(-100vh) rotate(-5deg);
+      opacity: 0;
+    }
+    .swipe-down {
+      transform: translateY(100vh) rotate(5deg);
+      opacity: 0;
+    }
+
+    @media (max-width: 600px) {
+      #image-container img {
+        max-width: 100%;
+        max-height: 100%;
+      }
+      #error-message {
+        font-size: 1rem;
+        padding: 8px 16px;
+      }
+      #legend {
+        gap: 16px;
+      }
+      .legend-symbol {
+        width: 14px;
+        height: 14px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div id="image-container">
+    <div id="error-message">Swipe errato! Riprova.</div>
+  </div>
+
+  <div id="legend">
+    <div class="legend-item">
+      <span class="legend-symbol up"></span>
+      <span>Swipe su</span>
+    </div>
+    <div class="legend-item">
+      <span class="legend-symbol down"></span>
+      <span>Swipe giù</span>
+    </div>
+  </div>
+
+  <script>
+    const setA = Array.from({ length: 10 }, (_, i) => ({ src: `setA/img${i+1}.jpg`, set: 'A' }));
+    const setB = Array.from({ length: 10 }, (_, i) => ({ src: `setB/img${i+1}.jpg`, set: 'B' }));
+    let imageSequence = [...setA, ...setB].sort(() => Math.random() - 0.5);
+
+    const container = document.getElementById('image-container');
+    const errorMsg = document.getElementById('error-message');
+    let index = 0;
+    let errorCount = 0;
+    let touchStartY = 0;
+    let touchEndY = 0;
+    let hintTimeout;
+
+    function showImage() {
+      const prev = container.querySelector('img');
+      if (prev) prev.remove();
+      clearTimeout(hintTimeout);
+
+      const current = imageSequence[index];
+      const img = document.createElement('img');
+      img.src = current.src;
+      img.style.border = '5px solid transparent';
+      container.appendChild(img);
+
+      hintTimeout = setTimeout(() => {
+        const color = current.set === 'A' ? '#e74c3c' : '#2ecc71';
+        img.style.border = `5px solid ${color}`;
+      }, 400); // LATENZA DI COMPARSA DEL BORDO COLORATO DI INDICAZIONE DELLA DIREZIONE DELLO SWIPE. Settare a 0 per avere il bordo immediato
+    }
+
+    function showError() {
+      errorCount++;
+      errorMsg.style.display = 'block';
+      clearTimeout(hintTimeout);
+      const img = container.querySelector('img');
+      if (img) img.style.border = '5px solid #e74c3c';
+      setTimeout(() => {
+        errorMsg.style.display = 'none';
+        if (img) img.style.border = '5px solid transparent';
+      }, 1500);
+    }
+
+    function showSuccessFeedback() {
+      const img = container.querySelector('img');
+      if (img) {
+        img.classList.add('success-border-img');
+        setTimeout(() => img.classList.remove('success-border-img'), 800);
+      }
+    }
+
+    function animateSwipe(direction, callback) {
+      const img = container.querySelector('img');
+      if (img) {
+        img.classList.add(direction === 'up' ? 'swipe-up' : 'swipe-down');
+        setTimeout(callback, 300);
+      } else callback();
+    }
+
+    function nextImage() {
+      index++;
+      if (index >= imageSequence.length) {
+        container.innerHTML = '';
+        const msg = document.createElement('div');
+        msg.className = 'final-message';
+        msg.textContent = "Hai completato la sequenza. Ora premi il bottone blu qui sotto per proseguire.";
+        container.appendChild(msg);
+        if (window.parent && window.parent !== window) {
+          window.parent.postMessage({ SwipeVerticalErrorCount: errorCount }, "*");
+        }
+        return;
+      }
+      showImage();
+    }
+
+    function handleSwipe(direction) {
+      clearTimeout(hintTimeout);
+      const img = container.querySelector('img');
+      if (img) img.style.border = '5px solid transparent';
+      const current = imageSequence[index];
+      const correct = (direction === 'down' && current.set === 'A') ||
+                      (direction === 'up' && current.set === 'B');
+      if (correct) {
+        showSuccessFeedback();
+        animateSwipe(direction, nextImage);
+      } else {
+        showError();
+      }
+    }
+
+    container.addEventListener('touchstart', e => touchStartY = e.changedTouches[0].screenY);
+    container.addEventListener('touchend', e => {
+      touchEndY = e.changedTouches[0].screenY;
+      const diff = touchEndY - touchStartY;
+      if (diff > 50) handleSwipe('down');
+      else if (diff < -50) handleSwipe('up');
+    });
+    document.addEventListener('keydown', e => {
+      if (e.key === 'ArrowDown') handleSwipe('down');
+      else if (e.key === 'ArrowUp') handleSwipe('up');
+    });
+
+    showImage();
+  </script>
+</body>
+</html>
