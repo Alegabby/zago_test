@@ -169,7 +169,8 @@
         bottom: bottomPathFull
       });
 
-      if (pairs.length === 20) break;
+      if (pairs.length === 20) break; //modificare in accordo con il numero di stimoli. Se ad esempio setA è fatto da 5 immagini
+									  //e il setB da 5 immagini qui devo settare 10 (5+5)
     }
 
     return pairs;
@@ -247,8 +248,8 @@
   } else {
     setTimeout(() => {
       showXScreen();
-      setTimeout(cycle, 1000);
-    }, 2000);
+      setTimeout(cycle, 500); // durata della pausa fra la presentazione di una coppia e la successiva
+    }, 5000); //durata della presentazione della coppia
   }
 }
 
