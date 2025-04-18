@@ -36,9 +36,9 @@
       object-fit: contain;
       border-radius: 16px;
       box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-      border: 1px solid #ccc;
       background-color: white;
       padding: 4px;
+      border: 5px solid transparent;
       transition: transform 0.3s ease, opacity 0.3s ease, border 0.3s ease;
       position: absolute;
       box-sizing: border-box;
@@ -66,11 +66,11 @@
       border-radius: 50%;
       margin-right: 8px;
     }
-    .legend-symbol.right {
-      background-color: #3498db; /* blu per destra */
-    }
     .legend-symbol.left {
       background-color: #2ecc71; /* verde per sinistra */
+    }
+    .legend-symbol.right {
+      background-color: #3498db; /* blu per destra */
     }
 
     #error-message {
@@ -128,12 +128,11 @@
   </div>
 
   <div id="legend">
-    
     <div class="legend-item">
       <span class="legend-symbol left"></span>
       <span>Swipe sinistra</span>
     </div>
-	  <div class="legend-item">
+    <div class="legend-item">
       <span class="legend-symbol right"></span>
       <span>Swipe destra</span>
     </div>
@@ -164,19 +163,24 @@
       hintTimeout = setTimeout(() => {
         const color = current.set === 'A' ? '#3498db' : '#2ecc71';
         img.style.border = `5px solid ${color}`;
-      }, 400);// LATENZA DI COMPARSA DEL BORDO COLORATO DI INDICAZIONE DELLA DIREZIONE DELLO SWIPE. Settare a 0 per avere il bordo immediato
+      }, 400); // LATENZA DI COMPARSA DEL BORDO COLORATO. Set = 0 per colore del bordo come indicatore presente da subito
     }
 
     function showError() {
       errorCount++;
       errorMsg.style.display = 'block';
       clearTimeout(hintTimeout);
+      const current = imageSequence[index];
       const img = container.querySelector('img');
-      if (img) img.style.border = '5px solid #888888';
+      if (img) {
+        // usa il colore di hint previsto
+        const expected = current.set === 'A' ? '#3498db' : '#2ecc71';
+        img.style.border = `5px solid ${expected}`;
+      }
+      // non rimuove il bordo, resta visibile fino alla prossima immagine
       setTimeout(() => {
         errorMsg.style.display = 'none';
-        if (img) img.style.border = '5px solid transparent';
-      }, 1500);
+      }, 1500); 
     }
 
     function showSuccessFeedback() {
@@ -199,7 +203,7 @@
         container.querySelectorAll('img').forEach(el => el.remove());
         const msg = document.createElement('div');
         msg.textContent = "Premi il bottone blu in basso per proseguire...";
-        msg.style.cssText = 'font-size:1rem; color:#2ecc71; background:white; padding:20px; border-radius:16px; box-shadow:0 4px 12px rgba(0,0,0,0.2)';
+        msg.style.cssText = 'font-size:1rem; color:#2ecc71; background:white; padding:20px; border-radius:16px';
         container.appendChild(msg);
         window.parent?.postMessage({ errorCount }, "*");
         return;
@@ -209,12 +213,16 @@
 
     function handleSwipe(direction) {
       clearTimeout(hintTimeout);
-      const img = container.querySelector('img');
-      if (img) img.style.border = '5px solid transparent';
+      // non resetta più il bordo qui
       const current = imageSequence[index];
-      const correct = (direction === 'right' && current.set === 'A') || (direction === 'left' && current.set === 'B');
-      if (correct) { showSuccessFeedback(); animateSwipe(direction, nextImage); }
-      else { showError(); }
+      const correct = (direction === 'right' && current.set === 'A') ||
+                      (direction === 'left' && current.set === 'B');
+      if (correct) {
+        showSuccessFeedback();
+        animateSwipe(direction, nextImage);
+      } else {
+        showError();
+      }
     }
 
     container.addEventListener('touchstart', e => touchStartX = e.changedTouches[0].screenX);
