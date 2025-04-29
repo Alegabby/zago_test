@@ -109,13 +109,13 @@
 <script>
 	
 	 //Numero di ripetizioni desiderate
-  const repetitionCount = 3;
+  const repetitionCount = 6;
 	
   // Definizione dei set di immagini
-  const setA = ["img1.png", "img2.png", "img3.png", "img4.png", "img5.png", "img6.png", "img7.png", "img8.png", "img9.png", "img10.png"];
-  const setB = ["img1.png", "img2.png", "img3.png", "img4.png", "img5.png", "img6.png", "img7.png", "img8.png", "img9.png", "img10.png"];
-  const setC = ["img1.png", "img2.png", "img3.png", "img4.png", "img5.png", "img6.png", "img7.png", "img8.png", "img9.png", "img10.png"];
-  const setD = ["img1.png", "img2.png", "img3.png", "img4.png", "img5.png", "img6.png", "img7.png", "img8.png", "img9.png", "img10.png"];
+  const setA = ["empeya1.png", "empeya2.png", "empeya3.png", "empeya4.png", "empeya5.png"];
+  const setB = ["vekte1.png", "vekte2.png", "vekte3.png", "vekte4.png", "vekte5.png"];
+  const setC = ["neg1.png", "neg2.png", "neg3.png", "neg4.png", "neg5.png"];
+  const setD = ["pos1.png", "pos2.png", "pos3.png", "pos4.png", "pos5.png"];
 
   function shuffle(array) {
     return array
@@ -169,7 +169,7 @@
         bottom: bottomPathFull
       });
 
-      if (pairs.length === 20) break; //modificare in accordo con il numero di stimoli. Se ad esempio setA è fatto da 5 immagini
+      if (pairs.length === 10) break; //modificare in accordo con il numero di stimoli. Se ad esempio setA è fatto da 5 immagini
 									  //e il setB da 5 immagini qui devo settare 10 (5+5)
     }
 
@@ -237,19 +237,11 @@
   showImages();
   currentCycle++;
 
-  //Mostra alert al termine di ogni sequenza
-  if (currentCycle % 20 === 0) {
-    const sequenceNum = currentCycle / 20;
-    setTimeout(() => {
-      alert(`Fine sequenza ${sequenceNum}`);
-      showXScreen();
-      setTimeout(cycle, 1000);
-    }, 2000);
-  } else {
+  {
     setTimeout(() => {
       showXScreen();
-      setTimeout(cycle, 500); // durata della pausa fra la presentazione di una coppia e la successiva
-    }, 5000); //durata della presentazione della coppia
+      setTimeout(cycle, 750); // durata della pausa fra la presentazione di una coppia e la successiva
+    }, 2000); //durata della presentazione della coppia
   }
 }
 
