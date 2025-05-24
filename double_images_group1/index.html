@@ -104,18 +104,24 @@
   <div id="finalMessage" class="final-message" style="display: none;">
     Hai completato la sequenza. Ora premi il bottone blu qui sotto per proseguire.
   </div>
-	
-	
+
+
 <script>
-	
-	 //Numero di ripetizioni desiderate
+  // Numero di ripetizioni desiderate
   const repetitionCount = 6;
-	
+
   // Definizione dei set di immagini
-  const setA = ["empeya1.png", "empeya2.png", "empeya3.png", "empeya4.png", "empeya5.png"];
-  const setB = ["vekte1.png", "vekte2.png", "vekte3.png", "vekte4.png", "vekte5.png"];
-  const setC = ["neg1.png", "neg2.png", "neg3.png", "neg4.png", "neg5.png"];
-  const setD = ["pos1.png", "pos2.png", "pos3.png", "pos4.png", "pos5.png"];
+  const setA = ["empeya1.jpg", "empeya2.jpg", "empeya3.jpg", "empeya4.jpg", "empeya5.jpg"];
+  const setB = ["vekte1.jpg", "vekte2.jpg", "vekte3.jpg", "vekte4.jpg", "vekte5.jpg"];
+  const setC = ["neg1.jpg", "neg2.jpg", "neg3.jpg", "neg4.jpg", "neg5.jpg"];
+  const setD = ["pos1.jpg", "pos2.jpg", "pos3.jpg", "pos4.jpg", "pos5.jpg"];
+
+  const allPaths = [
+    ...setA.map(f => 'setA/' + f),
+    ...setB.map(f => 'setB/' + f),
+    ...setC.map(f => 'setC/' + f),
+    ...setD.map(f => 'setD/' + f)
+  ];
 
   function shuffle(array) {
     return array
@@ -145,7 +151,6 @@
       if (used[set].includes(file)) continue;
 
       let topPath = `set${set}/${file}`;
-      let bottomPath = null;
       let pairSet = null;
 
       switch (set) {
@@ -169,8 +174,7 @@
         bottom: bottomPathFull
       });
 
-      if (pairs.length === 10) break; //modificare in accordo con il numero di stimoli. Se ad esempio setA è fatto da 5 immagini
-									  //e il setB da 5 immagini qui devo settare 10 (5+5)
+      if (pairs.length === 10) break; // modifica se cambi numero immagini
     }
 
     return pairs;
@@ -187,68 +191,79 @@
     return { all, logSequences };
   }
 
-  //Creazione sequenze e logging
-  const basePairs = createInitialPairs();
-  const { all, logSequences } = generateAllPairs(basePairs, repetitionCount);
-  const allPairs = all;
-  const totalCycles = allPairs.length;
-  let currentCycle = 0;
+  // Preloading delle immagini
+  function preloadImages(paths, callback) {
+    let loaded = 0;
+    const total = paths.length;
 
-  //Log delle sequenze
-  logSequences.forEach((seq, index) => {
-    console.log(`Sequenza ${index + 1}:`);
-    seq.forEach(pair => {
-      console.log(`${pair.top} + ${pair.bottom}`);
+    paths.forEach(path => {
+      const img = new Image();
+      img.onload = img.onerror = () => {
+        loaded++;
+        if (loaded === total) {
+          callback();
+        }
+      };
+      img.src = path;
     });
-  });
+  }
 
-  //Presentazione
+  // Elementi del DOM
   const topImg = document.getElementById("topImage");
   const bottomImg = document.getElementById("bottomImage");
   const container = document.getElementById("imageContainer");
   const xScreen = document.getElementById("xScreen");
   const finalMsg = document.getElementById("finalMessage");
 
-  function showImages() {
-    const pair = allPairs[currentCycle];
-    topImg.src = pair.top;
-    bottomImg.src = pair.bottom;
-    xScreen.style.display = "none";
-    container.style.display = "flex";
-  }
+  // Avvia tutto dopo preload
+  preloadImages(allPaths, () => {
+    const basePairs = createInitialPairs();
+    const { all, logSequences } = generateAllPairs(basePairs, repetitionCount);
+    const allPairs = all;
+    const totalCycles = allPairs.length;
+    let currentCycle = 0;
 
-  function showXScreen() {
-    container.style.display = "none";
-    xScreen.style.display = "flex";
-  }
+    // Logging in console
+    logSequences.forEach((seq, index) => {
+      console.log(`Sequenza ${index + 1}:`);
+      seq.forEach(pair => {
+        console.log(`${pair.top} + ${pair.bottom}`);
+      });
+    });
 
- function cycle() {
-  if (currentCycle >= totalCycles) {
-    container.style.display = "none";
-    xScreen.style.display = "none";
-    finalMsg.style.display = "block";
-    if (window.parent && window.parent !== window) {
-      window.parent.postMessage("nextButton", "*");
+    function showImages() {
+      const pair = allPairs[currentCycle];
+      topImg.src = pair.top;
+      bottomImg.src = pair.bottom;
+      xScreen.style.display = "none";
+      container.style.display = "flex";
     }
-    return;
-  }
 
-  // Mostra immagini
-  showImages();
-  currentCycle++;
+    function showXScreen() {
+      container.style.display = "none";
+      xScreen.style.display = "flex";
+    }
 
-  {
-    setTimeout(() => {
-      showXScreen();
-      setTimeout(cycle, 750); // durata della pausa fra la presentazione di una coppia e la successiva
-    }, 2000); //durata della presentazione della coppia
-  }
-}
+    function cycle() {
+      if (currentCycle >= totalCycles) {
+        container.style.display = "none";
+        xScreen.style.display = "none";
+        finalMsg.style.display = "block";
+        if (window.parent && window.parent !== window) {
+          window.parent.postMessage("nextButton", "*");
+        }
+        return;
+      }
 
+      showImages();
+      currentCycle++;
 
-  cycle();
+      setTimeout(() => {
+        showXScreen();
+        setTimeout(cycle, 750);
+      }, 2000);
+    }
+
+    cycle();
+  });
 </script>
-
-
-</body>
-</html>
