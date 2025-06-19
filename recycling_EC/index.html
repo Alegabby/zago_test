@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Presentazione Immagini</title>
+<style>
+  html, body {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    width: 100%;
+    overflow: hidden;
+    font-family: sans-serif;
+    background-color: #ffffff;
+  }
+
+  .container {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-evenly;
+    align-items: center;
+    box-sizing: border-box;
+    padding: 10px;
+  }
+
+  .image-block {
+    flex: 1;
+    width: 100%;
+    max-height: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 10px;
+    box-sizing: border-box;
+  }
+
+  .image-block img {
+    max-width: 95%;
+    max-height: 95%;
+    width: auto;
+    height: auto;
+    object-fit: contain;
+    border-radius: 16px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    border: 1px solid #ccc;
+    background-color: white;
+    padding: 4px;
+  }
+
+  .x-screen {
+    width: 100%;
+    height: 100%;
+    display: none;
+    justify-content: center;
+    align-items: center;
+    font-size: 10vw;
+    font-weight: bold;
+    color: #333;
+    background-color: white;
+  }
+
+  .final-message {
+    font-size: 1rem;
+    color: #2ecc71;
+    background-color: white;
+    padding: 20px;
+    border-radius: 16px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    text-align: center;
+  }
+
+  @media (max-width: 600px) {
+    .image-block {
+      padding: 5px;
+    }
+
+    .image-block img {
+      max-width: 100%;
+      max-height: 100%;
+    }
+
+    .final-message {
+      font-size: 1rem;
+      padding: 16px;
+    }
+  }
+</style>
+</head>
+<body>
+
+  <div class="container" id="imageContainer">
+    <div class="image-block" id="topImageBlock">
+      <img id="topImage" src="" alt="Top image">
+    </div>
+    <div class="image-block" id="bottomImageBlock">
+      <img id="bottomImage" src="" alt="Bottom image">
+    </div>
+  </div>
+
+  <div class="x-screen" id="xScreen">X</div>
+  <div id="finalMessage" class="final-message" style="display: none;">
+    Hai completato la sequenza. Ora premi il bottone blu qui sotto per proseguire.
+  </div>
+
+
+<script>
+  // Numero di ripetizioni desiderate
+  const repetitionCount = 6;
+
+  // Definizione dei set di immagini
+  const setA = ["banana_u_grande.jpg", "uova_c_grande.jpg", "scontrini_n_grande.jpg", "bottvetro_p_grande.jpg", "pastiglie_p_grande.jpg"];
+  const setB = ["alluminio_n_grande.jpg", "bottplast_c_grande.jpg", "vasetto_n_grande.jpg", "sigaretta_u_grande.jpg", "pennarello_p_grande.jpg"];
+  const setC = ["pos1.jpg", "pos2.jpg", "pos3.jpg", "pos4.jpg", "pos5.jpg"];
+  const setD = ["neg1.jpg", "neg2.jpg", "neg3.jpg", "neg4.jpg", "neg5.jpg"];
+
+  const allPaths = [
+    ...setA.map(f => 'setA/' + f),
+    ...setB.map(f => 'setB/' + f),
+    ...setC.map(f => 'setC/' + f),
+    ...setD.map(f => 'setD/' + f)
+  ];
+
+  function shuffle(array) {
+    return array
+      .map(value => ({ value, sort: Math.random() }))
+      .sort((a, b) => a.sort - b.sort)
+      .map(({ value }) => value);
+  }
+
+  function createInitialPairs() {
+    const remainingA = shuffle([...setA]);
+    const remainingB = shuffle([...setB]);
+    const remainingC = shuffle([...setC]);
+    const remainingD = shuffle([...setD]);
+
+    const allImages = shuffle(
+      [...remainingA.map(img => ({ set: 'A', file: img }))].concat(
+      [...remainingB.map(img => ({ set: 'B', file: img }))],
+      [...remainingC.map(img => ({ set: 'C', file: img }))],
+      [...remainingD.map(img => ({ set: 'D', file: img }))])
+    );
+
+    const used = { A: [], B: [], C: [], D: [] };
+    const pairs = [];
+
+    for (const img of allImages) {
+      const { set, file } = img;
+      if (used[set].includes(file)) continue;
+
+      let topPath = `set${set}/${file}`;
+      let pairSet = null;
+
+      switch (set) {
+        case 'A': pairSet = 'C'; break;
+        case 'B': pairSet = 'D'; break;
+        case 'C': pairSet = 'A'; break;
+        case 'D': pairSet = 'B'; break;
+      }
+
+      const candidatePool = { A: remainingA, B: remainingB, C: remainingC, D: remainingD }[pairSet];
+      const available = candidatePool.find(f => !used[pairSet].includes(f));
+
+      if (!available) continue;
+
+      used[set].push(file);
+      used[pairSet].push(available);
+      let bottomPathFull = `set${pairSet}/${available}`;
+
+      pairs.push({
+        top: topPath,
+        bottom: bottomPathFull
+      });
+
+      if (pairs.length === 10) break; // modifica se cambi numero immagini
+    }
+
+    return pairs;
+  }
+
+  function generateAllPairs(basePairs, repetitions) {
+    const all = [];
+    const logSequences = [];
+    for (let i = 0; i < repetitions; i++) {
+      const shuffled = shuffle([...basePairs]);
+      logSequences.push(shuffled);
+      all.push(...shuffled);
+    }
+    return { all, logSequences };
+  }
+
+  // Preloading delle immagini
+  function preloadImages(paths, callback) {
+    let loaded = 0;
+    const total = paths.length;
+
+    paths.forEach(path => {
+      const img = new Image();
+      img.onload = img.onerror = () => {
+        loaded++;
+        if (loaded === total) {
+          callback();
+        }
+      };
+      img.src = path;
+    });
+  }
+
+  // Elementi del DOM
+  const topImg = document.getElementById("topImage");
+  const bottomImg = document.getElementById("bottomImage");
+  const container = document.getElementById("imageContainer");
+  const xScreen = document.getElementById("xScreen");
+  const finalMsg = document.getElementById("finalMessage");
+
+  // Avvia tutto dopo preload
+  preloadImages(allPaths, () => {
+    const basePairs = createInitialPairs();
+    const { all, logSequences } = generateAllPairs(basePairs, repetitionCount);
+    const allPairs = all;
+    const totalCycles = allPairs.length;
+    let currentCycle = 0;
+
+    // Logging in console
+    logSequences.forEach((seq, index) => {
+      console.log(`Sequenza ${index + 1}:`);
+      seq.forEach(pair => {
+        console.log(`${pair.top} + ${pair.bottom}`);
+      });
+    });
+
+    function showImages() {
+      const pair = allPairs[currentCycle];
+      topImg.src = pair.top;
+      bottomImg.src = pair.bottom;
+      xScreen.style.display = "none";
+      container.style.display = "flex";
+    }
+
+    function showXScreen() {
+      container.style.display = "none";
+      xScreen.style.display = "flex";
+    }
+
+    function cycle() {
+      if (currentCycle >= totalCycles) {
+        container.style.display = "none";
+        xScreen.style.display = "none";
+        finalMsg.style.display = "block";
+        if (window.parent && window.parent !== window) {
+          window.parent.postMessage("nextButton", "*");
+        }
+        return;
+      }
+
+      showImages();
+      currentCycle++;
+
+      setTimeout(() => {
+        showXScreen();
+        setTimeout(cycle, 750);
+      }, 3000);
+    }
+
+    cycle();
+  });
+</script>
