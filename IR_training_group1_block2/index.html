@@ -151,7 +151,7 @@
       container.appendChild(img);
 
       hintTimeout = setTimeout(() => {
-        const color = current.set === 'A' ? '#12CA12' : '#4B0092'; // Color frame assignment to a set of stimuli
+        const color = current.set === 'B' ? '#4B0092' : '#12CA12'; // Color frame assignment to a set of stimuli
         img.style.border = `5px solid ${color}`;
       }, 0); // COLORED BORDER APPEARANCE LATENCY. Set = 0 for border color as an indicator present immediately.
     }
@@ -205,8 +205,8 @@
       clearTimeout(hintTimeout);
       // It no longer reset the border here
       const current = imageSequence[index];
-      const correct = (direction === 'left' && current.set === 'A') ||
-                      (direction === 'right' && current.set === 'B');
+      const correct = (direction === 'right' && current.set === 'B') ||
+                      (direction === 'left' && current.set === 'A');
       if (correct) {
         showSuccessFeedback();
         animateSwipe(direction, nextImage);
