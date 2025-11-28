@@ -195,7 +195,7 @@
         msg.textContent = "The block sequence is complete. Press the blue button below to continue.";
         msg.style.cssText = 'font-size:1rem; color:#2ecc71; background:white; padding:20px; border-radius:16px';
         container.appendChild(msg);
-        window.parent?.postMessage({ errors_train_block2 }, "*");
+        window.parent.postMessage({ errors_train_block2:errors_train_block2 }, "*");
         return;
       }
       showImage();
