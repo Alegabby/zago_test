@@ -91,8 +91,9 @@
     const pA=genPlac(setA.length),pB=genPlac(setB.length);
     const seq=[...setA.map((s,i)=>({src:s,set:'A',placement:pA[i]})),...setB.map((s,i)=>({src:s,set:'B',placement:pB[i]}))].sort(()=>Math.random()-.5);
     let idx=0,errors=0;const cont=document.getElementById('stimulus-container'),err=document.getElementById('error-message'),fin=document.getElementById('final-message');
-    function show(){cont.innerHTML='';err.style.display='none';if(idx>=seq.length){window.parent.postMessage({ errors }, "*");
-fin.textContent = "The test sequence is complete. Press the button below to continue.";
+    function show(){cont.innerHTML='';err.style.display='none';if(idx>=seq.length){fin.textContent = "The test sequence is complete. Press the button below to continue."; fin.style.display = "block";
+ setTimeout(() => { window.parent.postMessage({ errors }, "*");
+ }, 50);
     return;
 }
 const{src,set,placement}=seq[idx],w=document.createElement('div');w.className='stimulus-wrapper';const img=document.createElement('img');img.src=src;img.className='stimulus-image';const p=document.createElement('div');p.className=`omino ${placement}`;p.innerHTML='<i class="fa-solid fa-male"></i>';w.append(img,p);cont.append(w);setTimeout(()=>img.classList.add(set==='A'?'border-green':'border-blue'),0);}   /* Qui per cambiare la presentazione del frame */  
