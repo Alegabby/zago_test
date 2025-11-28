@@ -205,8 +205,8 @@
       clearTimeout(hintTimeout);
       // It no longer reset the border here
       const current = imageSequence[index];
-      const correct = (direction === 'right' && current.set === 'A') ||
-                      (direction === 'left' && current.set === 'B');
+      const correct = (direction === 'left' && current.set === 'A') ||
+                      (direction === 'right' && current.set === 'B');
       if (correct) {
         showSuccessFeedback();
         animateSwipe(direction, nextImage);
