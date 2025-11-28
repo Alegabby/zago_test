@@ -151,7 +151,7 @@
       container.appendChild(img);
 
       hintTimeout = setTimeout(() => {
-        const color = current.set === 'B' ? '#4B0092' : '#12CA12'; // Color frame assignment to a set of stimuli
+        const color = current.set === 'B' ? '#12CA12' : '#4B0092'; // Color frame assignment to a set of stimuli
         img.style.border = `5px solid ${color}`;
       }, 0); // COLORED BORDER APPEARANCE LATENCY. Set = 0 for border color as an indicator present immediately.
     }
@@ -164,7 +164,7 @@
       const img = container.querySelector('img');
       if (img) {
         // It use the expected hint color
-        const expected = current.set === 'A' ? '#12CA12' : '#4B0092';
+        const expected = current.set === 'B' ? '#12CA12' : '#4B0092';
         img.style.border = `5px solid ${expected}`;
       }
       // It does not remove the border, it remains visible until the next image
