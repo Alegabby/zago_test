@@ -91,7 +91,8 @@
     const pA=genPlac(setA.length),pB=genPlac(setB.length);
     const seq=[...setA.map((s,i)=>({src:s,set:'A',placement:pA[i]})),...setB.map((s,i)=>({src:s,set:'B',placement:pB[i]}))].sort(()=>Math.random()-.5);
     let idx=0,errors_training=0;const cont=document.getElementById('stimulus-container'),err=document.getElementById('error-message'),fin=document.getElementById('final-message');
-    function show(){cont.innerHTML='';err.style.display='none';if(idx>=seq.length){ fin.textContent = "The training sequence is complete. Press the button below to continue."; fin.style.display = "block";
+    function show(){cont.innerHTML='';err.style.display='none';if(idx>=seq.length){ cont.innerHTML = "";
+fin.textContent = "The training sequence is complete. Press the button below to continue."; fin.style.display = "block";
  setTimeout(() => { window.parent.postMessage({ errors_training }, "*");
  }, 50);
     return;
