@@ -137,7 +137,7 @@
 
     const container = document.getElementById('image-container');
     const errorMsg = document.getElementById('error-message');
-    let index = 0, errors_train_block1 = 0, touchStartX = 0, touchEndX = 0, hintTimeout;
+    let index = 0, errors_block1 = 0, touchStartX = 0, touchEndX = 0, hintTimeout;
 
     function showImage() {
       const prev = container.querySelector('img');
@@ -150,28 +150,20 @@
       img.style.border = '5px solid transparent';
       container.appendChild(img);
 
-      hintTimeout = setTimeout(() => {
-        const color = current.set === 'A' ? '#4B0092' : '#12CA12'; // Color frame assignment to a set of stimuli
-        img.style.border = `5px solid ${color}`;
-      }, 0); // COLORED BORDER APPEARANCE LATENCY. Set = 0 for border color as an indicator present immediately.
     }
 
     function showError() {
-      errors_train_block1++;
+      errors_block1++;
       errorMsg.style.display = 'block';
       clearTimeout(hintTimeout);
       const current = imageSequence[index];
       const img = container.querySelector('img');
       if (img) {
-        // It use the expected hint color
-        const expected = current.set === 'A' ? '#4B0092' : '#12CA12';
-        img.style.border = `5px solid ${expected}`;
-      }
-      // It does not remove the border, it remains visible until the next image
-      setTimeout(() => {
+        setTimeout(() => {
         errorMsg.style.display = 'none';
-      }, 1500); 
+      }, 500); 
     }
+   }
 
     function showSuccessFeedback() {
       const img = container.querySelector('img');
@@ -195,7 +187,7 @@
         msg.textContent = "The block sequence is complete. Press the blue button below to continue.";
         msg.style.cssText = 'font-size:1rem; color:#2ecc71; background:white; padding:20px; border-radius:16px';
         container.appendChild(msg);
-        window.parent.postMessage({ errors_train_block1 }, "*");
+        window.parent?.postMessage({ errors_block1 }, "*");
         return;
       }
       showImage();
@@ -205,8 +197,8 @@
       clearTimeout(hintTimeout);
       // It no longer reset the border here
       const current = imageSequence[index];
-      const correct = (direction === 'right' && current.set === 'A') ||
-                      (direction === 'left' && current.set === 'B');
+      const correct = (direction === 'left' && current.set === 'A') ||
+                      (direction === 'right' && current.set === 'B');
       if (correct) {
         showSuccessFeedback();
         animateSwipe(direction, nextImage);
