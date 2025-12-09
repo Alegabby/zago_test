@@ -137,7 +137,7 @@
 
     const container = document.getElementById('image-container');
     const errorMsg = document.getElementById('error-message');
-    let index = 0, errors_block1 = 0, touchStartX = 0, touchEndX = 0, hintTimeout;
+    let index = 0, errors_train_block1 = 0, touchStartX = 0, touchEndX = 0, hintTimeout;
 
     function showImage() {
       const prev = container.querySelector('img');
@@ -153,7 +153,7 @@
     }
 
     function showError() {
-      errors_block1++;
+      errors_train_block1++;
       errorMsg.style.display = 'block';
       clearTimeout(hintTimeout);
       const current = imageSequence[index];
@@ -161,15 +161,10 @@
       if (img) {
         setTimeout(() => {
         errorMsg.style.display = 'none';
-      }, 500); 
+      }, 400); 
     }
    }
 
-    function showSuccessFeedback() {
-      const img = container.querySelector('img');
-      if (img) img.classList.add('success-border');
-      setTimeout(() => img && img.classList.remove('success-border'), 500);
-    }
 
     function animateSwipe(dir, cb) {
       const img = container.querySelector('img');
@@ -187,7 +182,7 @@
         msg.textContent = "The block sequence is complete. Press the blue button below to continue.";
         msg.style.cssText = 'font-size:1rem; color:#2ecc71; background:white; padding:20px; border-radius:16px';
         container.appendChild(msg);
-        window.parent?.postMessage({ errors_block1 }, "*");
+        window.parent?.postMessage({ errors_train_block1 }, "*");
         return;
       }
       showImage();
@@ -200,7 +195,6 @@
       const correct = (direction === 'left' && current.set === 'A') ||
                       (direction === 'right' && current.set === 'B');
       if (correct) {
-        showSuccessFeedback();
         animateSwipe(direction, nextImage);
       } else {
         showError();
