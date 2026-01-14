@@ -84,8 +84,8 @@
   <div id="error-message">Wrong answer. Try again.</div>
   <div id="final-message"></div>
   <script>
-    const setA=['setA/img1.jpg','setA/img2.jpg','setA/img3.jpg','setA/img4.jpg','setA/img5.jpg','setA/img6.jpg','setA/img7.jpg','setA/img8.jpg','setA/img9.jpg','setA/img10.jpg','setA/img11.jpg','setA/img12.jpg','setA/img13.jpg','setA/img14.jpg','setA/img15.jpg','setA/img16.jpg','setA/img17.jpg','setA/img18.jpg','setA/img19.jpg','setA/img20.jpg','setA/img21.jpg','setA/img22.jpg','setA/img23.jpg','setA/img24.jpg','setA/img25.jpg'];
-    const setB=['setB/img1.jpg','setB/img2.jpg','setB/img3.jpg','setB/img4.jpg','setB/img5.jpg','setB/img6.jpg','setB/img7.jpg','setB/img8.jpg','setB/img9.jpg','setB/img10.jpg','setB/img11.jpg','setB/img12.jpg','setB/img13.jpg','setB/img14.jpg','setB/img15.jpg','setB/img16.jpg','setB/img17.jpg','setB/img18.jpg','setB/img19.jpg','setB/img20.jpg','setB/img21.jpg','setB/img22.jpg','setB/img23.jpg','setB/img24.jpg','setB/img25.jpg'];
+    const setA=['setA/img1.jpg','setA/img2.jpg','setA/img3.jpg','setA/img4.jpg','setA/img5.jpg','setA/img6.jpg','setA/img7.jpg','setA/img8.jpg','setA/img9.jpg','setA/img10.jpg','setA/img11.jpg','setA/img12.jpg','setA/img13.jpg','setA/img14.jpg','setA/img15.jpg','setA/img16.jpg','setA/img17.jpg','setA/img18.jpg','setA/img19.jpg','setA/img20.jpg','setA/img21.jpg','setA/img22.jpg','setA/img23.jpg','setA/img24.jpg','setA/img25.jpg','setA/img26.jpg','setA/img27.jpg','setA/img28.jpg','setA/img29.jpg','setA/img30.jpg'];
+    const setB=['setB/img1.jpg','setB/img2.jpg','setB/img3.jpg','setB/img4.jpg','setB/img5.jpg','setB/img6.jpg','setB/img7.jpg','setB/img8.jpg','setB/img9.jpg','setB/img10.jpg','setB/img11.jpg','setB/img12.jpg','setB/img13.jpg','setB/img14.jpg','setB/img15.jpg','setB/img16.jpg','setB/img17.jpg','setB/img18.jpg','setB/img19.jpg','setB/img20.jpg','setB/img21.jpg','setB/img22.jpg','setB/img23.jpg','setB/img24.jpg','setB/img25.jpg','setB/img26.jpg','setB/img27.jpg','setB/img28.jpg','setB/img29.jpg','setB/img30.jpg'];
     [...setA,...setB].forEach(s=>new Image().src=s);
     function genPlac(n){const h=Math.floor(n/2),arr=[...Array(h).fill('above'),...Array(h).fill('below')];if(n%2)arr.push(Math.random()<.5?'above':'below');for(let i=arr.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[arr[i],arr[j]]=[arr[j],arr[i]];}return arr;}
     const pA=genPlac(setA.length),pB=genPlac(setB.length);
@@ -93,7 +93,7 @@
     let idx=0,errors=0;const cont=document.getElementById('stimulus-container'),err=document.getElementById('error-message'),fin=document.getElementById('final-message');
     function show(){cont.innerHTML='';err.style.display='none';if(idx>=seq.length){fin.textContent = "The test sequence is complete. Press the button below to continue."; fin.style.display = "block";
  setTimeout(() => { window.parent.postMessage({ errors }, "*");
- }, 50);
+ }, 60);
     return;
 }
 const{src,set,placement}=seq[idx],w=document.createElement('div');w.className='stimulus-wrapper';const img=document.createElement('img');img.src=src;img.className='stimulus-image';const p=document.createElement('div');p.className=`omino ${placement}`;p.innerHTML='<i class="fa-solid fa-male"></i>';w.append(img,p);cont.append(w);setTimeout(()=>img.classList.add(set==='A'?'border-green':'border-blue'),0);}   /* Qui per cambiare dopo quanto compare il frame */  
