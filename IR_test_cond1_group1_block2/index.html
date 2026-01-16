@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Images presentation</title>
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      background-color: #ffffff;
+      height: 100vh;
+      width: 100vw;
+      font-family: sans-serif;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+    }
+
+    #image-container {
+      width: 90%;
+      height: 70%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      position: relative;
+      box-sizing: border-box;
+      background-color: #ffffff;
+    }
+
+    #image-container img {
+      max-width: 95%;
+      max-height: 95%;
+      object-fit: contain;
+      border-radius: 16px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+      background-color: white;
+      padding: 4px;
+      border: 5px solid transparent;
+      transition: transform 0.3s ease, opacity 0.3s ease, border 0.3s ease;
+      position: absolute;
+      box-sizing: border-box;
+    }
+
+    #legend {
+      width: 90%;
+      display: flex;
+      justify-content: center;
+      gap: 24px;
+      margin-top: 16px;
+    }
+
+    .legend-item {
+      display: flex;
+      align-items: center;
+      font-size: 1rem;
+      color: #333;
+    }
+
+    .legend-symbol {
+      display: inline-block;
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      margin-right: 8px;
+    }
+    .legend-symbol.left {
+      background-color: #12CA12; /* green for left */
+    }
+    .legend-symbol.right {
+      background-color: #4B0092; /* blue for right */
+    }
+
+    #error-message {
+      position: absolute;
+      top: 10%;
+      left: 50%;
+      transform: translateX(-50%);
+      color: #e74c3c;
+      font-size: 1.5rem;
+      background-color: rgba(255, 255, 255, 0.95);
+      padding: 10px 20px;
+      border-radius: 12px;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+      display: none;
+      z-index: 10;
+    }
+
+    .success-border {
+      border: 5px solid #2ecc71 !important;
+      border-radius: 20px;
+    }
+
+    .swipe-left {
+      transform: translateX(-100vw) rotate(-10deg);
+      opacity: 0;
+    }
+
+    .swipe-right {
+      transform: translateX(100vw) rotate(10deg);
+      opacity: 0;
+    }
+
+    @media (max-width: 600px) {
+      #image-container img {
+        max-width: 100%;
+        max-height: 100%;
+      }
+      #error-message {
+        font-size: 1.2rem;
+        padding: 8px 16px;
+      }
+      #legend {
+        gap: 16px;
+      }
+      .legend-symbol {
+        width: 14px;
+        height: 14px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div id="image-container">
+    <div id="error-message">Wrong answer. Try again.</div>
+  </div>
+
+
+  <script>
+    console.log("Inside iframe? ", window.parent !== window);
+    const setA = Array.from({ length: 16 }, (_, i) => ({ src: `setA/img${i+1}.jpg`, set: 'A' }));
+    const setB = Array.from({ length: 16 }, (_, i) => ({ src: `setB/img${i+1}.jpg`, set: 'B' }));
+
+    let imageSequence = [...setA, ...setB].sort(() => Math.random() - 0.5);
+
+    const container = document.getElementById('image-container');
+    const errorMsg = document.getElementById('error-message');
+    let index = 0, errors_block2 = 0, touchStartX = 0, touchEndX = 0, hintTimeout;
+
+    function showImage() {
+      const prev = container.querySelector('img');
+      if (prev) prev.remove();
+      clearTimeout(hintTimeout);
+
+      const current = imageSequence[index];
+      const img = document.createElement('img');
+      img.src = current.src;
+      img.style.border = '5px solid transparent';
+      container.appendChild(img);
+
+    }
+
+    function showError() {
+      errors_block2++;
+      errorMsg.style.display = 'block';
+      clearTimeout(hintTimeout);
+      const current = imageSequence[index];
+      const img = container.querySelector('img');
+      if (img) {
+        setTimeout(() => {
+        errorMsg.style.display = 'none';
+      }, 400); 
+    }
+   }
+
+    function animateSwipe(dir, cb) {
+      const img = container.querySelector('img');
+      if (img) {
+        img.classList.add(dir === 'right' ? 'swipe-right' : 'swipe-left');
+        setTimeout(cb, 300);
+      } else cb();
+    }
+
+    function nextImage() {
+      index++;
+      if (index >= imageSequence.length) {
+        container.querySelectorAll('img').forEach(el => el.remove());
+        const msg = document.createElement('div');
+        msg.textContent = "The block sequence is complete. Press the blue button below to continue.";
+        msg.style.cssText = 'font-size:1rem; color:#2ecc71; background:white; padding:20px; border-radius:16px';
+        container.appendChild(msg);
+        window.parent?.postMessage({ errors_block2 }, "*");
+        return;
+      }
+      showImage();
+    }
+
+    function handleSwipe(direction) {
+      clearTimeout(hintTimeout);
+      // It no longer reset the border here
+      const current = imageSequence[index];
+      const correct = (direction === 'left' && current.set === 'A') ||
+                      (direction === 'right' && current.set === 'B');
+      if (correct) {
+        animateSwipe(direction, nextImage);
+      } else {
+        showError();
+      }
+    }
+
+    container.addEventListener('touchstart', e => touchStartX = e.changedTouches[0].screenX);
+    container.addEventListener('touchend', e => {
+      touchEndX = e.changedTouches[0].screenX;
+      const diff = touchEndX - touchStartX;
+      if (diff > 50) handleSwipe('right');
+      else if (diff < -50) handleSwipe('left');
+    });
+    document.addEventListener('keydown', e => {
+      if (e.key === 'ArrowRight') handleSwipe('right');
+      else if (e.key === 'ArrowLeft') handleSwipe('left');
+    });
+
+    showImage();
+  </script>
+</body>
+</html>
