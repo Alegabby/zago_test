@@ -12,7 +12,7 @@
     html, body { width: 100%; height: 100%; overflow: hidden; }
     body { display: flex; justify-content: center; align-items: center; background: #fff; }
 
-    /* Container fullscreen, overflow visibile per omino */
+    /* Container fullscreen, overflow visibile for the manikin ("omino") */
     #stimulus-container {
       position: relative;
       width: 100vw;
@@ -50,7 +50,7 @@
     .omino.above { bottom: calc(100% + 50px); }
     .omino.below { top:    calc(100% + 50px); }
 
-    /* Camminata */
+    /* Walking */
     @keyframes walk-in-down { 0%{transform:translate(-50%,0) rotate(0deg);}20%{transform:translate(-50%,10px) rotate(15deg);}40%{transform:translate(-50%,20px) rotate(0deg);}60%{transform:translate(-50%,30px) rotate(-15deg);}80%{transform:translate(-50%,40px) rotate(15deg);}100%{transform:translate(-50%,50px) rotate(0deg);} }
     @keyframes walk-in-up   { 0%{transform:translate(-50%,0) rotate(0deg);}20%{transform:translate(-50%,-10px) rotate(-15deg);}40%{transform:translate(-50%,-20px) rotate(0deg);}60%{transform:translate(-50%,-30px) rotate(15deg);}80%{transform:translate(-50%,-40px) rotate(-15deg);}100%{transform:translate(-50%,-50px) rotate(0deg);} }
     @keyframes walk-away-up { 0%{transform:translate(-50%,0) rotate(0deg);}20%{transform:translate(-50%,-10px) rotate(-15deg);}40%{transform:translate(-50%,-20px) rotate(15deg);}60%{transform:translate(-50%,-30px) rotate(-15deg);}80%{transform:translate(-50%,-40px) rotate(15deg);}100%{transform:translate(-50%,-49px) rotate(0deg);} }
@@ -61,11 +61,11 @@
     .walk-away-up   { animation:walk-away-up 0.8s ease forwards; }
     .walk-away-down { animation:walk-away-down 0.8s ease forwards; }
 
-    /* Bordo stimolo */
+    /* Stimulus border */
     .border-green { border: 5px solid #12CA12; }
     .border-blue  { border: 5px solid #4B0092; }
 
-    /* Messaggi */
+    /* Messagges */
     #error-message, #final-message {
       position: absolute;
       left: 50%;
@@ -90,16 +90,24 @@
     function genPlac(n){const h=Math.floor(n/2),arr=[...Array(h).fill('above'),...Array(h).fill('below')];if(n%2)arr.push(Math.random()<.5?'above':'below');for(let i=arr.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[arr[i],arr[j]]=[arr[j],arr[i]];}return arr;}
     const pA=genPlac(setA.length),pB=genPlac(setB.length);
     const seq=[...setA.map((s,i)=>({src:s,set:'A',placement:pA[i]})),...setB.map((s,i)=>({src:s,set:'B',placement:pB[i]}))].sort(()=>Math.random()-.5);
-    let idx=0,errors=0;const cont=document.getElementById('stimulus-container'),err=document.getElementById('error-message'),fin=document.getElementById('final-message');
+    let idx=0,errors=0; let acceptingResponse = false; const cont=document.getElementById('stimulus-container'),err=document.getElementById('error-message'),fin=document.getElementById('final-message');
     function show(){cont.innerHTML='';err.style.display='none';if(idx>=seq.length){fin.textContent = "The test sequence is complete. Press the button below to continue."; fin.style.display = "block";
  setTimeout(() => { window.parent.postMessage({ errors }, "*");
  }, 60);
     return;
 }
-const{src,set,placement}=seq[idx],w=document.createElement('div');w.className='stimulus-wrapper';const img=document.createElement('img');img.src=src;img.className='stimulus-image';const p=document.createElement('div');p.className=`omino ${placement}`;p.innerHTML='<i class="fa-solid fa-male"></i>';w.append(img,p);cont.append(w);setTimeout(()=>img.classList.add(set==='A'?'border-green':'border-blue'),0);}   /* Qui per cambiare dopo quanto compare il frame */  
-    function handle(dir){const pEl=document.querySelector('.omino'),{set,placement}=seq[idx],exp=set==='A'?(placement==='above'?'down':'up'):(placement==='above'?'up':'down'); if(dir!==exp){errors++;err.style.display='block';setTimeout(() => {
+const{src,set,placement}=seq[idx],w=document.createElement('div');w.className='stimulus-wrapper';const img=document.createElement('img');img.src=src;img.className='stimulus-image';const p=document.createElement('div');p.className=`omino ${placement}`;p.innerHTML='<i class="fa-solid fa-male"></i>';w.append(img,p);cont.append(w);setTimeout(()=>img.classList.add(set==='A'?'border-green':'border-blue'),0);   /* Here to change the presentation of the colored frame (with the stimulus or with a delay) */  
+setTimeout(() => {
+	acceptingResponse = true;
+}, 200); // Duration ITI
+}
+    function handle(dir){
+if (!acceptingResponse) return; // Block input if the trial is not ready
+acceptingResponse = false // Block input after the response
+const pEl=document.querySelector('.omino'),{set,placement}=seq[idx],exp=set==='A'?(placement==='above'?'down':'up'):(placement==='above'?'up':'down'); if(dir!==exp){errors++;err.style.display='block';setTimeout(() => {
     	err.style.display = 'none';
-    	}, 400);return;}
+	acceptingResponse = true; // Allows to retry the response to a trial
+    	}, 300);return;}
 const cls=(set==='B'?'walk-away-':'walk-in-')+exp;pEl.classList.add(cls);pEl.addEventListener('animationend',()=>{setTimeout(()=>{pEl.classList.remove(cls);idx++;show();},200);},{once:true});}
     let y0;cont.addEventListener('touchstart',e=>y0=e.changedTouches[0].clientY);cont.addEventListener('touchend',e=>{const d=e.changedTouches[0].clientY-y0; if(d>50)handle('down');else if(d<-50)handle('up');});
     window.addEventListener('keydown',e=>{if(e.key==='ArrowUp')handle('up');else if(e.key==='ArrowDown')handle('down');});
