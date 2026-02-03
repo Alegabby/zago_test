@@ -130,14 +130,27 @@
 
   <script>
     console.log("Inside iframe? ", window.parent !== window);
-    const setA = Array.from({ length: 10 }, (_, i) => ({ src: `setA/img${i+1}.jpg`, set: 'A' }));
-    const setB = Array.from({ length: 10 }, (_, i) => ({ src: `setB/img${i+1}.jpg`, set: 'B' }));
+    const setA = Array.from({ length: 32 }, (_, i) => ({ src: `setA/img${i+1}.jpg`, set: 'A' }));
+    const setB = Array.from({ length: 32 }, (_, i) => ({ src: `setB/img${i+1}.jpg`, set: 'B' }));
 
-    let imageSequence = [...setA, ...setB].sort(() => Math.random() - 0.5);
+
+function shuffle(array) {
+  for (let i = array.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [array[i], array[j]] = [array[j], array[i]];
+  }
+  return array;
+}
+let imageSequence = shuffle([...setA, ...setB]);
+    
 
     const container = document.getElementById('image-container');
     const errorMsg = document.getElementById('error-message');
     let index = 0, errors_block1 = 0, touchStartX = 0, touchEndX = 0, hintTimeout;
+
+let canRespond = true;   // check if responses are accepted
+const ITI = 400;        // ITI duration in ms
+
 
     function showImage() {
       const prev = container.querySelector('img');
@@ -149,6 +162,8 @@
       img.src = current.src;
       img.style.border = '5px solid transparent';
       container.appendChild(img);
+
+      canRespond = true; // to make sure the input is reactivated when the stimulus is visible
 
     }
 
@@ -184,7 +199,7 @@
       if (index >= imageSequence.length) {
         container.querySelectorAll('img').forEach(el => el.remove());
         const msg = document.createElement('div');
-        msg.textContent = "The block sequence is complete. Press the blue button below to continue.";
+        msg.textContent = "This part is complete. Click on the arrow below to continue.";
         msg.style.cssText = 'font-size:1rem; color:#2ecc71; background:white; padding:20px; border-radius:16px';
         container.appendChild(msg);
         window.parent?.postMessage({ errors_block1 }, "*");
@@ -194,16 +209,27 @@
     }
 
     function handleSwipe(direction) {
+        if (!canRespond) return; // block all responses during the ITI
+  canRespond = false;
+
       clearTimeout(hintTimeout);
       // It no longer reset the border here
       const current = imageSequence[index];
       const correct = (direction === 'left' && current.set === 'A') ||
                       (direction === 'right' && current.set === 'B');
       if (correct) {
-        showSuccessFeedback();
-        animateSwipe(direction, nextImage);
+           showSuccessFeedback();
+    animateSwipe(direction, () => {
+      setTimeout(() => {
+        nextImage();
+        canRespond = true; // reactivate responses after the ITI
+      }, ITI);
+    });
       } else {
         showError();
+          setTimeout(() => {
+      canRespond = true; // reactivate also after the error
+    }, ITI);
       }
     }
 
