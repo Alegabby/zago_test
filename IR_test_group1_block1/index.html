@@ -145,6 +145,15 @@ function shuffle(array) {
 let imageSequence = shuffle([...setA, ...setB]);
 
 
+// progressive preload in background
+function preloadRemainingImages() {
+  for (let i = 1; i < imageSequence.length; i++) {
+    const img = new Image();
+    img.src = imageSequence[i].src;
+  }
+}
+
+
     const container = document.getElementById('image-container');
     const errorMsg = document.getElementById('error-message');
     let index = 0, errors_block1 = 0, touchStartX = 0, touchEndX = 0, hintTimeout;
@@ -287,16 +296,6 @@ if (!canRespond) return; // block all responses during the ITI
    showImage();
    preloadRemainingImages();
     };
-
-
-// progressive preload in background
-function preloadRemainingImages() {
-  for (let i = 1; i < imageSequence.length; i++) {
-    const img = new Image();
-    img.src = imageSequence[i].src;
-  }
-}
-
 
   </script>
 </body>
