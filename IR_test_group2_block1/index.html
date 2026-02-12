@@ -149,8 +149,30 @@ let imageSequence = shuffle([...setA, ...setB]);
     let index = 0, errors_block1 = 0, touchStartX = 0, touchEndX = 0, hintTimeout;
 
 let canRespond = true;   // check if responses are accepted
-const ITI = 400;        // ITI duration in ms
+const ITI = 500;        // ITI duration in ms
 
+// to pre-load all images
+function preloadImages(imageArray, callback) {
+  let loaded = 0;
+  const total = imageArray.length;
+
+  imageArray.forEach(item => {
+    const img = new Image();
+    img.src = item.src;
+    img.onload = () => {
+      loaded++;
+      if (loaded === total) {
+        callback();
+      }
+    };
+    img.onerror = () => {
+      loaded++;
+      if (loaded === total) {
+        callback();
+      }
+    };
+  });
+}
 
     function showImage() {
       const prev = container.querySelector('img');
@@ -161,11 +183,17 @@ const ITI = 400;        // ITI duration in ms
       const img = document.createElement('img');
       img.src = current.src;
       img.style.border = '5px solid transparent';
+      
+      canRespond = false; // block until the image is visible
+
+      img.onload = function() {
+      canRespond = true; // reactivate the input/response when the stimulus is loaded
+      };
+
       container.appendChild(img);
+      }
 
-      canRespond = true; // to make sure the input is reactivated when the stimulus is visible
 
-    }
 
     function showError() {
       errors_block1++;
@@ -199,7 +227,7 @@ const ITI = 400;        // ITI duration in ms
       if (index >= imageSequence.length) {
         container.querySelectorAll('img').forEach(el => el.remove());
         const msg = document.createElement('div');
-        msg.textContent = "This part is complete. Click on the arrow below to continue.";
+        msg.textContent = "Image sequence completed. Click on the arrow below to continue.";
         msg.style.cssText = 'font-size:1rem; color:#2ecc71; background:white; padding:20px; border-radius:16px';
         container.appendChild(msg);
         window.parent?.postMessage({ errors_block1 }, "*");
@@ -245,7 +273,11 @@ const ITI = 400;        // ITI duration in ms
       else if (e.key === 'ArrowLeft') handleSwipe('left');
     });
 
-    showImage();
+    canRespond = false; // block until everything has changed
+preloadImages(imageSequence, () => {
+  showImage();
+});
+
   </script>
 </body>
 </html>
