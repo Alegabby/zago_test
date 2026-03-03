@@ -130,8 +130,8 @@
 
   <script>
     console.log("Inside iframe? ", window.parent !== window);
-    const setA = Array.from({ length: 4 }, (_, i) => ({ src: `setA/img${i+1}.jpg`, set: 'A' }));
-    const setB = Array.from({ length: 4 }, (_, i) => ({ src: `setB/img${i+1}.jpg`, set: 'B' }));
+    const setA = Array.from({ length: 8 }, (_, i) => ({ src: `setA/img${i+1}.jpg`, set: 'A' }));
+    const setB = Array.from({ length: 8 }, (_, i) => ({ src: `setB/img${i+1}.jpg`, set: 'B' }));
 
 
 function shuffle(array) {
@@ -268,8 +268,8 @@ function showSuccessFeedback() {
       else if (diff < -50) handleSwipe('left');
     });
     document.addEventListener('keydown', e => {
-      if (e.key === 'ArrowRight') handleSwipe('right');
-      else if (e.key === 'ArrowLeft') handleSwipe('left');
+      if (e.key === 'k') handleSwipe('right');
+      else if (e.key === 'd') handleSwipe('left');
     });
 
     canRespond = false; // block until everything has changed
