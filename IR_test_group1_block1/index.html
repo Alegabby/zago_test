@@ -284,8 +284,8 @@ if (!canRespond) return; // block all responses during the ITI
       else if (diff < -50) handleSwipe('left');
     });
     document.addEventListener('keydown', e => {
-      if (e.key === 'ArrowRight') handleSwipe('right');
-      else if (e.key === 'ArrowLeft') handleSwipe('left');
+      if (e.key === 'k') handleSwipe('right');
+      else if (e.key === 'd') handleSwipe('left');
     });
 
     canRespond = false; // block until everything has changed
