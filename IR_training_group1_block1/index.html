@@ -124,7 +124,7 @@
 </head>
 <body>
   <div id="image-container">
-    <div id="error-message">Wrong answer. Try again.</div>
+    <div id="error-message">Risposta sbagliata. Riprova.</div>
   </div>
 
 
@@ -232,7 +232,7 @@ function showSuccessFeedback() {
       if (index >= imageSequence.length) {
         container.querySelectorAll('img').forEach(el => el.remove());
         const msg = document.createElement('div');
-        msg.textContent = "Image sequence completed. Click on the arrow below to continue.";
+        msg.textContent = "Sequenza di immagini completata. Clicca sulla freccia qui sotto per continuare.";
         msg.style.cssText = 'font-size:1rem; color:#2ecc71; background:white; padding:20px; border-radius:16px';
         container.appendChild(msg);
         window.parent?.postMessage({ errors_train_block1 }, "*");
