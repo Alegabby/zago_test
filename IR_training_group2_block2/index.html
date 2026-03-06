@@ -246,8 +246,8 @@ function showSuccessFeedback() {
       const current = imageSequence[index];
       const correct = (direction === 'left' && current.set === 'A') ||
                       (direction === 'right' && current.set === 'B');
-      if (correct) {
-          showSuccessFeedback();
+      if(correct) {
+        // showSuccessFeedback();
     animateSwipe(direction, () => {
       setTimeout(() => {
         nextImage();
