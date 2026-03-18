@@ -155,6 +155,7 @@ function preloadRemainingImages() {
     const container = document.getElementById('image-container');
     const errorMsg = document.getElementById('error-message');
     let index = 0, errors_block2 = 0, touchStartX = 0, touchEndX = 0, hintTimeout;
+    let isReady = false;
 
 let canRespond = true;   // check if responses are accepted
 const ITI = 500;        // ITI duration in ms
@@ -289,9 +290,21 @@ function showSuccessFeedback() {
     firstImage.src = imageSequence[0].src;
 
     firstImage.onload = function() {
+     isReady = true;
+
+     // if we are not in Qualtrics (where the click is required)
+     if (window.parent === window) {
+     showImage();
+     preloadRemainingImages();
+      }
+    };
+
+window.addEventListener('message', e => {
+  if (e.data && e.data.start && isReady) {
     showImage();
     preloadRemainingImages();
-    };
+  }
+});
 
   </script>
 </body>
