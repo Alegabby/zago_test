@@ -268,10 +268,17 @@ function showSuccessFeedback() {
       if (diff > 50) handleSwipe('right');
       else if (diff < -50) handleSwipe('left');
     });
+    // input keyboard from Windows, Chrome etc.
     window.addEventListener('keydown', e => {
       if (e.key.toLowerCase() === 'k') handleSwipe('right');
       else if (e.key.toLowerCase() === 'd') handleSwipe('left');
     });
+    // input from parent (for Safari)
+    window.addEventListener('message', e => {
+     if (e.data && e.data.key === 'right') handleSwipe('right');
+     if (e.data && e.data.key === 'left') handleSwipe('left');
+    });
+
 
     canRespond = false; // block until everything has changed
 preloadImages(imageSequence, () => {
