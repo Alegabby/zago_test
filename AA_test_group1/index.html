@@ -9,18 +9,21 @@
   <style>
     /* Reset & Box-sizing */
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-    html, body { width: 100%; height: 100%; overflow: hidden; }
+    html, body { width: 100%; height: 100%; overflow: hidden; position: fixed; /* blocca scroll su Safari iOS */ top: 0; left: 0; }
     body { display: flex; justify-content: center; align-items: center; background: #fff; }
 
     /* Container fullscreen, overflow visibile for the manikin ("omino") */
-    #stimulus-container {
-      position: relative;
-      width: 100%;
-      height: 100%;
-      overflow: hidden;
-      padding-top: 80px;
-      padding-bottom: 80px;
-    }
+   #stimulus-container {
+position: relative;
+width: 100%;
+height: 100%;
+overflow: visible;
+padding-top: 100px;
+padding-bottom: 100px;
+display: flex;
+align-items: center;
+justify-content: center;
+}
 
     .stimulus-wrapper {
       position: relative;
@@ -31,8 +34,8 @@
     .stimulus-image {
       display: inline-block;
       
-      max-width: 85vw;
-      max-height: 60%;
+      max-width: 75vw;
+      max-height: 50vh;
       object-fit: contain;
       border-radius: 8px;
       box-shadow: 0 2px 8px rgba(0,0,0,0.2);
