@@ -120,7 +120,7 @@
 </head>
 <body>
   <div id="stimulus-container"></div>
-  <div id="error-message">Wrong answer. Try again.</div>
+  <div id="error-message">Risposta sbagliata. Riprova.</div>
   <div id="final-message"></div>
   <script>
     const setA=['setA/img1.jpg','setA/img2.jpg','setA/img3.jpg','setA/img4.jpg','setA/img5.jpg','setA/img6.jpg','setA/img7.jpg','setA/img8.jpg','setA/img9.jpg','setA/img10.jpg','setA/img11.jpg','setA/img12.jpg','setA/img13.jpg','setA/img14.jpg','setA/img15.jpg','setA/img16.jpg','setA/img17.jpg','setA/img18.jpg','setA/img19.jpg','setA/img20.jpg','setA/img21.jpg','setA/img22.jpg','setA/img23.jpg','setA/img24.jpg','setA/img25.jpg','setA/img26.jpg','setA/img27.jpg','setA/img28.jpg','setA/img29.jpg','setA/img30.jpg'];
@@ -157,10 +157,26 @@ img.onerror = reject;
 );
 }
 
-    function show(){cont.innerHTML='';err.style.display='none';if(idx>=seq.length){fin.textContent = "Sequenza di immagini completata. Clicca sulla freccia qui sotto per continuare."; fin.style.display = "block";
- setTimeout(() => { window.parent.postMessage({ errors }, "*");
- }, 60);
-    return;
+    function show(){cont.innerHTML='';err.style.display='none';
+if (idx >= seq.length) {
+  cont.innerHTML = '';
+  fin.innerHTML = `
+    Sequenza completata.<br><br>
+    <button id="continueBtn" style="
+      font-size: 1.2rem;
+      padding: 14px 32px;
+      background: #4B0092;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;">
+      Continua
+    </button>`;
+  fin.style.display = 'block';
+  document.getElementById('continueBtn').addEventListener('click', () => {
+    window.parent.postMessage({ errors }, "*");
+  });
+  return;
 }
 const{src,set,placement}=seq[idx],w=document.createElement('div');w.className='stimulus-wrapper';const img=document.createElement('img');img.src=src;img.className='stimulus-image';const p=document.createElement('div');p.className=`omino ${placement}`;p.innerHTML='<i class="fa-solid fa-male"></i>';w.append(img,p);cont.append(w);setTimeout(()=>img.classList.add(set==='A'?'border-green':'border-blue'),0);   /* Here to change the presentation of the colored frame (with the stimulus or with a delay) */
   if (img.complete) {
