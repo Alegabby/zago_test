@@ -55,7 +55,8 @@
       object-fit: contain;
       border-radius: 8px;
       box-shadow: 0 2px 8px rgba(0,0,0,0.2);
-      transition: border 0.3s ease;
+      transition: border 0.3s ease, opacity 0.15s ease;
+      opacity: 0;
     }
 
 
@@ -161,7 +162,7 @@ img.onerror = reject;
     function show(){cont.innerHTML='';err.style.display='none';
 if (idx >= seq.length) {
   cont.innerHTML = '';
-  fin.innerHTML = 'Sequenza completata. Clicca sulla freccia qui sotto per continuare.';
+  fin.innerHTML = 'Sequenza completata. Clicca sulla freccia per continuare.';
   fin.style.display = 'block';
   window.parent.postMessage({ done: true, errors }, "*");
   return;
@@ -171,7 +172,7 @@ const{src,set,placement}=seq[idx],w=document.createElement('div');w.className='s
 const img=document.createElement('img');
 img.src=src;
 img.className='stimulus-image';
-img.style.visibility='hidden'; // nascosta finché non pronta
+img.style.opacity = '0';
 
 const p=document.createElement('div');
 p.className=`omino ${placement}`;
@@ -182,7 +183,7 @@ cont.append(w);
 const reveal = () => {
     requestAnimationFrame(() => {
         requestAnimationFrame(() => {
-            img.style.visibility = 'visible';
+            img.style.opacity = '1';
             img.classList.add(set === 'A' ? 'border-green' : 'border-blue'); /* Here to change the presentation of the colored frame (with the stimulus or with a delay) */
             setTimeout(() => { acceptingResponse = true; }, 200); // Duration ITI
         });
