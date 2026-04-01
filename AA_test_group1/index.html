@@ -165,19 +165,31 @@ if (idx >= seq.length) {
   window.parent.postMessage({ done: true, errors }, "*");
   return;
 }
-const{src,set,placement}=seq[idx],w=document.createElement('div');w.className='stimulus-wrapper';const img=document.createElement('img');img.src=src;img.className='stimulus-image';const p=document.createElement('div');p.className=`omino ${placement}`;p.innerHTML='<i class="fa-solid fa-male"></i>';w.append(img,p);cont.append(w);setTimeout(()=>img.classList.add(set==='A'?'border-green':'border-blue'),0);   /* Here to change the presentation of the colored frame (with the stimulus or with a delay) */
-  if (img.complete) {
-setTimeout(() => {
-acceptingResponse = true;
-}, 200);
-} else {
-img.onload = () => {
-setTimeout(() => {
-acceptingResponse = true;
-}, 200); // Duration ITI
+
+const{src,set,placement}=seq[idx],w=document.createElement('div');w.className='stimulus-wrapper';
+const img=document.createElement('img');
+img.src=src;
+img.className='stimulus-image';
+img.style.visibility='hidden'; // nascosta finché non pronta
+
+const p=document.createElement('div');
+p.className=`omino ${placement}`;
+p.innerHTML='<i class="fa-solid fa-male"></i>';
+w.append(img,p);
+cont.append(w);
+
+const reveal = () => {
+    img.style.visibility = 'visible';
+    img.classList.add(set==='A' ? 'border-green' : 'border-blue');  /* Here to change the presentation of the colored frame (with the stimulus or with a delay) */
+    setTimeout(() => { acceptingResponse = true; }, 200); // Duration ITI
 };
+
+if (img.complete && img.naturalWidth > 0) {
+    reveal();
+} else {
+    img.onload = reveal;
 }
-} 
+}
 
     function handle(dir){
        if (!acceptingResponse) return;   // Block input if the trial is not ready
