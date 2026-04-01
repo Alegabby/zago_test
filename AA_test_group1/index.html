@@ -49,9 +49,8 @@
 
     .stimulus-image {
       display: inline-block;
-      
-      max-width: 75vw;
-      max-height: 50vh;
+      max-width: 50vw;
+      max-height: 35vh;
       object-fit: contain;
       border-radius: 8px;
       box-shadow: 0 2px 8px rgba(0,0,0,0.2);
@@ -69,8 +68,8 @@
       opacity: 0;
       transition: opacity 0.15s ease;
     }
-   .omino.above { bottom: calc(100% + 40px); }
-   .omino.below { top:    calc(100% + 40px); }
+   .omino.above { bottom: calc(100% + 5px); }
+   .omino.below { top:    calc(100% + 5px); }
 
 
     /* Walking */
@@ -105,8 +104,8 @@
     .walk-away-down { animation:walk-away-down 0.8s ease forwards; }
 
     /* Stimulus border */
-    .border-green { border: 5px solid #12CA12; }
-    .border-blue  { border: 5px solid #4B0092; }
+    .border-yellow { border: 5px solid #FFC20A; }
+    .border-blue  { border: 5px solid #0C7BDC; }
 
     /* Messages */
     #error-message, #final-message {
@@ -188,7 +187,7 @@ const reveal = () => {
         requestAnimationFrame(() => {
             img.style.opacity = '1';
             p.style.opacity = '1';
-            img.classList.add(set === 'A' ? 'border-green' : 'border-blue'); /* Here to change the presentation of the colored frame (with the stimulus or with a delay) */
+            img.classList.add(set === 'A' ? 'border-yellow' : 'border-blue'); /* Here to change the presentation of the colored frame (with the stimulus or with a delay) */
             setTimeout(() => { acceptingResponse = true; }, 200); // Duration ITI
         });
     });
