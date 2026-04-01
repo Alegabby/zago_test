@@ -160,22 +160,9 @@ img.onerror = reject;
     function show(){cont.innerHTML='';err.style.display='none';
 if (idx >= seq.length) {
   cont.innerHTML = '';
-  fin.innerHTML = `
-    Sequenza completata.<br><br>
-    <button id="continueBtn" style="
-      font-size: 1.2rem;
-      padding: 14px 32px;
-      background: #4B0092;
-      color: white;
-      border: none;
-      border-radius: 8px;
-      cursor: pointer;">
-      Continua
-    </button>`;
+  fin.innerHTML = 'Sequenza completata. Clicca sulla freccia qui sotto per continuare.';
   fin.style.display = 'block';
-  document.getElementById('continueBtn').addEventListener('click', () => {
-    window.parent.postMessage({ errors }, "*");
-  });
+  window.parent.postMessage({ done: true, errors }, "*");
   return;
 }
 const{src,set,placement}=seq[idx],w=document.createElement('div');w.className='stimulus-wrapper';const img=document.createElement('img');img.src=src;img.className='stimulus-image';const p=document.createElement('div');p.className=`omino ${placement}`;p.innerHTML='<i class="fa-solid fa-male"></i>';w.append(img,p);cont.append(w);setTimeout(()=>img.classList.add(set==='A'?'border-green':'border-blue'),0);   /* Here to change the presentation of the colored frame (with the stimulus or with a delay) */
