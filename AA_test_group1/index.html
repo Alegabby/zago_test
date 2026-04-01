@@ -44,6 +44,7 @@
   justify-content: center;
   align-items: center;
   width: 100%;
+  min-height: 300px;
 }
 
     .stimulus-image {
@@ -179,19 +180,22 @@ w.append(img,p);
 cont.append(w);
 
 const reveal = () => {
-    img.style.visibility = 'visible';
-    img.classList.add(set==='A' ? 'border-green' : 'border-blue');  /* Here to change the presentation of the colored frame (with the stimulus or with a delay) */
-    setTimeout(() => { acceptingResponse = true; }, 200); // Duration ITI
+    requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+            img.style.visibility = 'visible';
+            img.classList.add(set === 'A' ? 'border-green' : 'border-blue'); /* Here to change the presentation of the colored frame (with the stimulus or with a delay) */
+            setTimeout(() => { acceptingResponse = true; }, 200); // Duration ITI
+        });
+    });
 };
-
 if (img.complete && img.naturalWidth > 0) {
     reveal();
 } else {
     img.onload = reveal;
 }
-}
 
-    function handle(dir){
+
+   function handle(dir){
        if (!acceptingResponse) return;   // Block input if the trial is not ready
        acceptingResponse = false;        // Block input after the response	
 const pEl=document.querySelector('.omino'),{set,placement}=seq[idx],exp=set==='A'?(placement==='above'?'down':'up'):(placement==='above'?'up':'down'); if(dir!==exp)	{errors++;err.style.display='block'; setTimeout(() => {
