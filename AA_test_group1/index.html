@@ -42,8 +42,8 @@
  
     .stimulus-image {
       display: block;
-      width: 200px;
-      height: 200px;
+      width: 240px;
+      height: 240px;
       object-fit: contain;
       border-radius: 8px;
       box-shadow: 0 2px 8px rgba(0,0,0,0.2);
@@ -55,14 +55,14 @@
       position: absolute;
       left: 50%;
       transform: translateX(-50%);
-      font-size: 2.5rem;
+      font-size: 2.7rem;
       z-index: 2;
       opacity: 0;
       transition: opacity 0.15s ease;
     }
  
-    .omino.above { top: calc(300px - 100px - 40px - 2.5rem); }
-    .omino.below { top: calc(300px + 100px + 40px); }
+    .omino.above { top: calc(300px - 120px - 40px - 2.7rem); }
+    .omino.below { top: calc(300px + 120px + 40px); }
  
     @keyframes walk-in-down {
       0%  { transform: translate(-50%, 0px)   rotate(0deg); }
@@ -188,6 +188,7 @@
       err.style.display = 'none';
  
       if (idx >= seq.length) {
+        stage.style.background = 'white';        
         if (window.parent === window) {
           fin.innerHTML = 'Sequenza completata.';
           fin.style.display = 'block';
