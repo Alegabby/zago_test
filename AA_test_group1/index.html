@@ -106,7 +106,7 @@
       border-radius: 4px;
       z-index: 10;
       display: none;
-      background: rgba(255,0,0,0.8);
+      background: rgba(220,40,40,0.80);
       color: #fff;
       white-space: nowrap;
     }
@@ -192,10 +192,12 @@
           fin.innerHTML = 'Sequenza completata.';
           fin.style.display = 'block';
         }
+      setTimeout(() => {
         window.parent.postMessage({ done: true, errors }, "*");
-        return;
+      }, 50);
+      return;
       }
- 
+       
       const { src, set, placement } = seq[idx];
  
       const w = document.createElement('div');
@@ -245,7 +247,7 @@
         setTimeout(() => {
           err.style.display = 'none';
           acceptingResponse = true;
-        }, 300);
+        }, 350);
         return;
       }
  
