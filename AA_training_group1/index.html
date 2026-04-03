@@ -4,118 +4,295 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Images Presentation</title>
-  <!-- Font Awesome per icona omino -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <style>
-    /* Reset & Box-sizing */
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-    html, body { width: 100%; height: 100%; overflow: hidden; }
-    body { display: flex; justify-content: center; align-items: center; background: #fff; }
-
-    /* Container fullscreen, overflow visibile for the manikin ("omino") */
-    #stimulus-container {
+    html, body {
+      width: 100%; height: 100%;
+      overflow: hidden;
+      position: fixed;
+      top: 0; left: 0;
+      background: #fff;
+    }
+    body {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+ 
+    #stage {
       position: relative;
-      width: 100vw;
-      height: 100vh;
+      width: 400px;
+      height: 600px;
       overflow: visible;
       display: flex;
       justify-content: center;
       align-items: center;
     }
-
+ 
     .stimulus-wrapper {
-      position: relative;
-      overflow: visible;
-      text-align: center;
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      display: flex;
+      justify-content: center;
+      align-items: center;
     }
-
+ 
     .stimulus-image {
-      display: inline-block;
-      
-      max-width: 85vw;
-      max-height: 40vh;
+      display: block;
+      width: 240px;
+      height: 240px;
       object-fit: contain;
       border-radius: 8px;
       box-shadow: 0 2px 8px rgba(0,0,0,0.2);
-      transition: border 0.3s ease;
+      transition: border 0.3s ease, opacity 0.15s ease;
+      opacity: 0;
     }
-
+ 
     .omino {
       position: absolute;
       left: 50%;
-      font-size: 2.5rem;
-      transform: translate(-50%, 0);
+      transform: translateX(-50%);
+      font-size: 2.7rem;
       z-index: 2;
+      opacity: 0;
+      transition: opacity 0.15s ease;
     }
-    .omino.above { bottom: calc(100% + 50px); }
-    .omino.below { top:    calc(100% + 50px); }
-
-    /* Walking */
-    @keyframes walk-in-down { 0%{transform:translate(-50%,0) rotate(0deg);}20%{transform:translate(-50%,10px) rotate(15deg);}40%{transform:translate(-50%,20px) rotate(0deg);}60%{transform:translate(-50%,30px) rotate(-15deg);}80%{transform:translate(-50%,40px) rotate(15deg);}100%{transform:translate(-50%,50px) rotate(0deg);} }
-    @keyframes walk-in-up   { 0%{transform:translate(-50%,0) rotate(0deg);}20%{transform:translate(-50%,-10px) rotate(-15deg);}40%{transform:translate(-50%,-20px) rotate(0deg);}60%{transform:translate(-50%,-30px) rotate(15deg);}80%{transform:translate(-50%,-40px) rotate(-15deg);}100%{transform:translate(-50%,-50px) rotate(0deg);} }
-    @keyframes walk-away-up { 0%{transform:translate(-50%,0) rotate(0deg);}20%{transform:translate(-50%,-10px) rotate(-15deg);}40%{transform:translate(-50%,-20px) rotate(15deg);}60%{transform:translate(-50%,-30px) rotate(-15deg);}80%{transform:translate(-50%,-40px) rotate(15deg);}100%{transform:translate(-50%,-49px) rotate(0deg);} }
-    @keyframes walk-away-down{ 0%{transform:translate(-50%,0) rotate(0deg);}20%{transform:translate(-50%,10px) rotate(15deg);}40%{transform:translate(-50%,20px) rotate(-15deg);}60%{transform:translate(-50%,30px) rotate(15deg);}80%{transform:translate(-50%,40px) rotate(-15deg);}100%{transform:translate(-50%,50px) rotate(0deg);} }
-
-    .walk-in-down   { animation:walk-in-down 0.8s ease forwards; }
-    .walk-in-up     { animation:walk-in-up   0.8s ease forwards; }
-    .walk-away-up   { animation:walk-away-up 0.8s ease forwards; }
-    .walk-away-down { animation:walk-away-down 0.8s ease forwards; }
-
-    /* Stimulus border */
-    .border-green { border: 5px solid #12CA12; }
-    .border-blue  { border: 5px solid #4B0092; }
-
-    /* Messagges */
-    #error-message, #final-message {
+ 
+    .omino.above { top: calc(300px - 120px - 40px - 2.7rem); }
+    .omino.below { top: calc(300px + 120px + 40px); }
+ 
+    @keyframes walk-in-down {
+      0%  { transform: translate(-50%, 0px)   rotate(0deg); }
+      33% { transform: translate(-50%, 12px)  rotate(12deg); }
+      66% { transform: translate(-50%, 24px)  rotate(-12deg); }
+      100%{ transform: translate(-50%, 36px)  rotate(0deg); }
+    }
+    @keyframes walk-in-up {
+      0%  { transform: translate(-50%, 0px)   rotate(0deg); }
+      33% { transform: translate(-50%, -12px) rotate(-12deg); }
+      66% { transform: translate(-50%, -24px) rotate(12deg); }
+      100%{ transform: translate(-50%, -36px) rotate(0deg); }
+    }
+    @keyframes walk-away-up {
+      0%  { transform: translate(-50%, 0px)   rotate(0deg); }
+      33% { transform: translate(-50%, -12px) rotate(-12deg); }
+      66% { transform: translate(-50%, -24px) rotate(12deg); }
+      100%{ transform: translate(-50%, -36px) rotate(0deg); }
+    }
+    @keyframes walk-away-down {
+      0%  { transform: translate(-50%, 0px)  rotate(0deg); }
+      33% { transform: translate(-50%, 12px) rotate(12deg); }
+      66% { transform: translate(-50%, 24px) rotate(-12deg); }
+      100%{ transform: translate(-50%, 36px) rotate(0deg); }
+    }
+ 
+    .walk-in-down   { animation: walk-in-down   0.8s ease forwards; }
+    .walk-in-up     { animation: walk-in-up     0.8s ease forwards; }
+    .walk-away-up   { animation: walk-away-up   0.8s ease forwards; }
+    .walk-away-down { animation: walk-away-down 0.8s ease forwards; }
+ 
+    .border-yellow { border: 5px solid #FFC20A; }
+    .border-blue   { border: 5px solid #0C7BDC; }
+ 
+    #error-message {
       position: absolute;
+      top: 10px;
       left: 50%;
       transform: translateX(-50%);
       padding: 8px 16px;
       border-radius: 4px;
       z-index: 10;
       display: none;
+      background: rgba(220,40,40,0.80);
+      color: #fff;
+      white-space: nowrap;
     }
-    #error-message { top: 10px; background: rgba(255,0,0,0.8); color: #fff; }
-    #final-message { top: 50%; transform: translate(-50%,-50%); font-size:1.5rem; }
+ 
+    #final-message {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      font-size: 1.5rem;
+      display: none;
+      text-align: center;
+    }
   </style>
 </head>
 <body>
-  <div id="stimulus-container"></div>
-  <div id="error-message">Wrong answer. Try again.</div>
-  <div id="final-message"></div>
+  <div id="stage">
+    <div id="error-message">Risposta sbagliata. Riprova.</div>
+    <div id="final-message"></div>
+  </div>
+ 
   <script>
-    const setA=['setA/img1.jpg','setA/img2.jpg','setA/img3.jpg','setA/img4.jpg'];
-    const setB=['setB/img1.jpg','setB/img2.jpg','setB/img3.jpg','setB/img4.jpg'];
-    [...setA,...setB].forEach(s=>new Image().src=s);
-    function genPlac(n){const h=Math.floor(n/2),arr=[...Array(h).fill('above'),...Array(h).fill('below')];if(n%2)arr.push(Math.random()<.5?'above':'below');for(let i=arr.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[arr[i],arr[j]]=[arr[j],arr[i]];}return arr;}
-    const pA=genPlac(setA.length),pB=genPlac(setB.length);
-    const seq=[...setA.map((s,i)=>({src:s,set:'A',placement:pA[i]})),...setB.map((s,i)=>({src:s,set:'B',placement:pB[i]}))].sort(()=>Math.random()-.5);
-    let idx=0,errors_training=0; let acceptingResponse = false; 
-const cont=document.getElementById('stimulus-container'),err=document.getElementById('error-message'),fin=document.getElementById('final-message');
-    function show(){cont.innerHTML='';err.style.display='none';if(idx>=seq.length){
-cont.innerHTML = "";
-fin.textContent = "The training sequence is complete. Press the button below to continue."; fin.style.display = "block";
- setTimeout(() => { window.parent.postMessage({ errors_training }, "*");
- }, 50);
-    return;
-}
-const{src,set,placement}=seq[idx],w=document.createElement('div');w.className='stimulus-wrapper';const img=document.createElement('img');img.src=src;img.className='stimulus-image';const p=document.createElement('div');p.className=`omino ${placement}`;p.innerHTML='<i class="fa-solid fa-male"></i>';w.append(img,p);cont.append(w);setTimeout(()=>img.classList.add(set==='A'?'border-green':'border-blue'),0);   /* Here to change the presentation of the colored frame (with the stimulus or with a delay) */  
-setTimeout(() => {
-	acceptingResponse = true;
-}, 200); // Duration ITI
-}
-    function handle(dir){
-if (!acceptingResponse) return; // Block input if the trial is not ready
-acceptingResponse = false; // Block input after the response
-const pEl=document.querySelector('.omino'),{set,placement}=seq[idx],exp=set==='A'?(placement==='above'?'down':'up'):(placement==='above'?'up':'down'); if(dir!==exp){errors_training++;err.style.display='block';setTimeout(() => {
-    	err.style.display = 'none';
-	acceptingResponse = true; // Allows to retry the response to a trial 
-    	}, 300);return;}
-const cls=(set==='B'?'walk-away-':'walk-in-')+exp;pEl.classList.add(cls);pEl.addEventListener('animationend',()=>{setTimeout(()=>{pEl.classList.remove(cls);idx++;show();},200);},{once:true});}
-    let y0;cont.addEventListener('touchstart',e=>y0=e.changedTouches[0].clientY);cont.addEventListener('touchend',e=>{const d=e.changedTouches[0].clientY-y0; if(d>50)handle('down');else if(d<-50)handle('up');});
-    window.addEventListener('keydown',e=>{if(e.key==='ArrowUp')handle('up');else if(e.key==='ArrowDown')handle('down');});
-    document.addEventListener('touchmove',e=>{if(window.scrollY===0&&e.changedTouches[0].clientY>0)e.preventDefault();},{passive:false});
-    show();
+    const setA = ['setA/img1.jpg','setA/img2.jpg','setA/img3.jpg','setA/img4.jpg'];
+    const setB = ['setB/img1.jpg','setB/img2.jpg','setB/img3.jpg','setB/img4.jpg'];
+ 
+    function genPlac(n) {
+      const h = Math.floor(n / 2);
+      const arr = [...Array(h).fill('above'), ...Array(h).fill('below')];
+      if (n % 2) arr.push(Math.random() < .5 ? 'above' : 'below');
+      for (let i = arr.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [arr[i], arr[j]] = [arr[j], arr[i]];
+      }
+      return arr;
+    }
+ 
+    const pA = genPlac(setA.length), pB = genPlac(setB.length);
+ 
+    function shuffle(array) {
+      for (let i = array.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [array[i], array[j]] = [array[j], array[i]];
+      }
+      return array;
+    }
+ 
+    const seq = shuffle([
+      ...setA.map((s, i) => ({ src: s, set: 'A', placement: pA[i] })),
+      ...setB.map((s, i) => ({ src: s, set: 'B', placement: pB[i] }))
+    ]);
+ 
+    let idx = 0, errors_training = 0, isReady = false, acceptingResponse = false;
+    const stage = document.getElementById('stage');
+    const err   = document.getElementById('error-message');
+    const fin   = document.getElementById('final-message');
+ 
+    function preloadImages(imageArray) {
+      return Promise.all(imageArray.map(src => new Promise((resolve, reject) => {
+        const img = new Image();
+        img.src = src;
+        img.onload = resolve;
+        img.onerror = reject;
+      })));
+    }
+ 
+    function scaleStage() {
+      const padding = 100;
+      const scaleX = (window.innerWidth  - padding * 2) / 400;
+      const scaleY = (window.innerHeight - padding * 2) / 600;
+      const scale  = Math.min(scaleX, scaleY, 1);
+      stage.style.transform = `scale(${scale})`;
+      stage.style.transformOrigin = 'center center';
+    }
+    scaleStage();
+    window.addEventListener('resize', scaleStage);
+ 
+    function show() {
+      stage.querySelectorAll('.stimulus-wrapper, .omino').forEach(el => el.remove());
+      err.style.display = 'none';
+ 
+      if (idx >= seq.length) {
+        stage.style.background = 'white';        
+        if (window.parent === window) {
+          fin.innerHTML = 'Sequenza completata.';
+          fin.style.display = 'block';
+        }
+      setTimeout(() => {
+        window.parent.postMessage({ done: true, errors_training }, "*");
+      }, 50);
+      return;
+      }
+       
+      const { src, set, placement } = seq[idx];
+ 
+      const w = document.createElement('div');
+      w.className = 'stimulus-wrapper';
+      const img = document.createElement('img');
+      img.src = src;
+      img.className = 'stimulus-image';
+      w.appendChild(img);
+      stage.appendChild(w);
+ 
+      const p = document.createElement('div');
+      p.className = `omino ${placement}`;
+      p.innerHTML = '<i class="fa-solid fa-male"></i>';
+      stage.appendChild(p);
+ 
+      const reveal = () => {
+        requestAnimationFrame(() => {
+          requestAnimationFrame(() => {
+            img.style.opacity = '1';
+            p.style.opacity = '1';
+            img.classList.add(set === 'A' ? 'border-yellow' : 'border-blue');
+            setTimeout(() => { acceptingResponse = true; }, 200);
+          });
+        });
+      };
+ 
+      if (img.complete && img.naturalWidth > 0) {
+        reveal();
+      } else {
+        img.onload = reveal;
+      }
+    }
+ 
+    function handle(dir) {
+      if (!acceptingResponse) return;
+      acceptingResponse = false;
+ 
+      const pEl = stage.querySelector('.omino');
+      const { set, placement } = seq[idx];
+      const exp = set === 'A'
+        ? (placement === 'above' ? 'down' : 'up')
+        : (placement === 'above' ? 'up'   : 'down');
+ 
+      if (dir !== exp) {
+        errors_training++;
+        err.style.display = 'block';
+        setTimeout(() => {
+          err.style.display = 'none';
+          acceptingResponse = true;
+        }, 350);
+        return;
+      }
+ 
+      const cls = (set === 'B' ? 'walk-away-' : 'walk-in-') + exp;
+      pEl.classList.add(cls);
+      pEl.addEventListener('animationend', () => {
+        setTimeout(() => {
+          pEl.classList.remove(cls);
+          idx++;
+          show();
+        }, 200);
+      }, { once: true });
+    }
+ 
+    let y0;
+    stage.addEventListener('touchstart', e => y0 = e.changedTouches[0].clientY);
+    stage.addEventListener('touchend', e => {
+      const d = e.changedTouches[0].clientY - y0;
+      if (d > 50) handle('down');
+      else if (d < -50) handle('up');
+    });
+ 
+    window.addEventListener('keydown', e => {
+      if (e.key === 'ArrowUp') handle('up');
+      else if (e.key === 'ArrowDown') handle('down');
+    });
+ 
+    window.addEventListener('message', e => {
+      if (e.data && e.data.key === 'up')   handle('up');
+      if (e.data && e.data.key === 'down') handle('down');
+    });
+ 
+    document.addEventListener('touchmove', e => {
+      if (window.scrollY === 0 && e.changedTouches[0].clientY > 0) e.preventDefault();
+    }, { passive: false });
+ 
+    preloadImages([...setA, ...setB]).then(() => {
+      isReady = true;
+      if (window.parent === window) show();
+    });
+ 
+    window.addEventListener('message', e => {
+      if (e.data && e.data.start && isReady) show();
+    });
   </script>
 </body>
 </html>
