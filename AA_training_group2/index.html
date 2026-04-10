@@ -94,8 +94,8 @@
     .walk-away-up   { animation: walk-away-up   0.8s ease forwards; }
     .walk-away-down { animation: walk-away-down 0.8s ease forwards; }
  
-    .border-yellow { border: 5px solid #FFC20A; }
-    .border-blue   { border: 5px solid #0C7BDC; }
+    .border-green { border: 5px solid #00B050; }
+    .border-blue   { border: 5px solid #00B0F0; }
  
     #error-message {
       position: absolute;
@@ -219,7 +219,7 @@
           requestAnimationFrame(() => {
             img.style.opacity = '1';
             p.style.opacity = '1';
-            img.classList.add(set === 'A' ? 'border-yellow' : 'border-blue');
+            img.classList.add(set === 'A' ? 'border-green' : 'border-blue');
             setTimeout(() => { acceptingResponse = true; }, 200);
           });
         });
